@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çalışan Anasayfa - FLOConnect Masraf</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .welcome-container {
+            max-width: 900px;
+            margin: 50px auto;
+        }
+        .user-welcome {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .user-welcome h1 {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-burgundy) 0%, var(--primary-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .user-welcome .role-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--primary-orange), #F4A460);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .user-welcome p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .module-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .module-card:hover {
+            border-color: var(--primary-orange);
+            box-shadow: 0 8px 24px rgba(230, 126, 80, 0.2);
+            transform: translateY(-4px);
+        }
+        .module-icon {
+            font-size: 56px;
+            margin-bottom: 24px;
+        }
+        .module-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .module-description {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .quick-stats {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .info-box {
+            margin-top: 40px;
+            background: linear-gradient(135deg, var(--primary-orange), #F4A460);
+            padding: 30px;
+            border-radius: 16px;
+            color: white;
+            text-align: center;
+        }
+        .info-box h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .info-box p {
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .back-link a {
+            color: var(--primary-orange);
+            text-decoration: none;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .back-link a:hover {
+            gap: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+            .user-welcome h1 {
+                font-size: 28px;
+            }
+            .module-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .module-card {
+                padding: 28px 24px;
+            }
+            .module-icon {
+                font-size: 42px;
+            }
+            .module-title {
+                font-size: 18px;
+            }
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .user-welcome h1 {
+                font-size: 22px;
+            }
+            .stat-card {
+                padding: 16px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span></div>
+        <button class="notification-btn">
+            🔔 Bildirimler
+        </button>
+    </header>
+
+    <!-- Main Container -->
+    <div style="min-height: calc(100vh - 60px); padding: 40px; background: #F8F9FA;">
+        <div class="welcome-container">
+            <div class="user-welcome">
+                <span class="role-badge">👤 Çalışan Profili</span>
+                <h1>Hoş Geldiniz, Berat Tanrıverdi</h1>
+                <p>Ürün Tasarım/Kullanıcı Deneyimi Müd. - Kıdemli Uzman</p>
+            </div>
+
+            <!-- Module Grid -->
+            <div class="module-grid">
+                <a href="masraf-formu.html" class="module-card">
+                    <div class="module-icon">🧾</div>
+                    <h3 class="module-title">Yeni Masraf Girişi</h3>
+                    <p class="module-description">
+                        Fiş veya fatura yükleyerek OCR ile otomatik okuma yapın. Masraf talebinizi oluşturun.
+                    </p>
+                </a>
+
+                <a href="masraf-listesi.html" class="module-card">
+                    <div class="module-icon">📋</div>
+                    <h3 class="module-title">Masraf Taleplerim</h3>
+                    <p class="module-description">
+                        Oluşturduğunuz tüm masraf taleplerini görüntüleyin. Onay durumlarını takip edin.
+                    </p>
+                </a>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--primary-orange);">12</div>
+                    <div class="stat-label">Toplam Masraf</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--success-dark);">8</div>
+                    <div class="stat-label">Onaylanan</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #856404;">3</div>
+                    <div class="stat-label">Beklemede</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--text-secondary);">1</div>
+                    <div class="stat-label">Taslak</div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div style="margin-top: 40px;">
+                <h3 style="font-size: 18px; margin-bottom: 20px; color: var(--text-primary);">Son İşlemler</h3>
+                <div style="background: white; border-radius: 12px; overflow: hidden;">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">MSR-2024-0045 - Yemek Faturası</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">10 Aralık 2024</div>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">MSR-2024-0044 - Taksi Fişi</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">9 Aralık 2024</div>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500; margin-bottom: 4px;">MSR-2024-0043 - Ofis Malzemesi</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">8 Aralık 2024</div>
+                        </div>
+                        <span class="status-badge status-waiting">Muhasebe Onayında</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3>📌 Önemli Hatırlatma</h3>
+                <p>
+                    Masraf girişlerinde <strong>fatura veya fiş görselini</strong> mutlaka yükleyiniz.<br>
+                    OCR sistemi belgenizi otomatik okuyacak ve form alanlarını dolduracaktır.<br>
+                    Kabul edilmeyen gider kalemleri: Tekel ürünleri, kişisel harcamalar, vb.
+                </p>
+            </div>
+
+            <!-- Back Link -->
+            <div class="back-link">
+                <a href="index.html">← Profil Seçimine Dön</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

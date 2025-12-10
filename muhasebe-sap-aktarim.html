@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP Aktarım - Muhasebe Paneli</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .muhasebe-header {
+            background: linear-gradient(90deg, #107C41 0%, #1DB954 100%);
+        }
+        .btn-sap {
+            background: #107C41;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-sap:hover {
+            background: #0D5F31;
+        }
+        .sap-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+        }
+        .sap-card.ready {
+            border-color: #107C41;
+            background: linear-gradient(135deg, #f0fff4, #ffffff);
+        }
+        .sap-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .sap-list-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sap-list-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header muhasebe-header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span> <span style="font-size: 14px; opacity: 0.8;">Muhasebe</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 12 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #107C41, #1DB954);">FA</div>
+                <div class="user-name">Fatma Aktaş</div>
+                <div class="user-title">Muhasebe Uzmanı</div>
+                <div class="user-role">Muhasebe Departmanı</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="muhasebe-panel.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onay-bekleyenler.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onaylananlar.html" class="nav-link">
+                        <span class="nav-icon">✅</span>
+                        Onaylananlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-sap-aktarim.html" class="nav-link active">
+                        <span class="nav-icon">📤</span>
+                        SAP Aktarım (EBA2SAP)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-raporlar.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-hesap-eslestirme.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Hesap Eşleştirme
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="muhasebe-panel.html">Panel</a>
+                <span>›</span>
+                <span>SAP Aktarım (EBA2SAP)</span>
+            </div>
+
+            <h1 class="page-title">SAP Aktarım İşlemleri</h1>
+
+            <!-- Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #107C41;">
+                    <div style="font-size: 28px; font-weight: 700; color: #107C41;">8</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Aktarım Bekliyor</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-dark);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--success-dark);">156</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Bu Ay Aktarılan</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-orange);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">₺28,450</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Bekleyen Tutar</div>
+                </div>
+            </div>
+
+            <!-- Aktarım Bekleyen Liste -->
+            <div class="sap-card ready">
+                <div class="sap-list-header">
+                    <div>
+                        <div class="sap-list-title">
+                            <span style="color: #107C41;">📤</span> EBA2SAP Aktarım Listesi
+                        </div>
+                        <div class="sap-list-meta">8 masraf - Toplam ₺28,450.00</div>
+                    </div>
+                    <button class="btn-sap" onclick="createSAPExport()">
+                        📥 SAP Dosyası Oluştur
+                    </button>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                                <th>Talep No</th>
+                                <th>Çalışan</th>
+                                <th>Hesap Kodu</th>
+                                <th>Tutar</th>
+                                <th>Şirket</th>
+                                <th>Onay Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" class="row-select" checked></td>
+                                <td><strong>MSR-2024-0055</strong></td>
+                                <td>Ayşe Kaya</td>
+                                <td>770.04</td>
+                                <td><strong>₺2,450.00</strong></td>
+                                <td>FLO Mağazacılık</td>
+                                <td>10 Ara 2024</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-select" checked></td>
+                                <td><strong>MSR-2024-0054</strong></td>
+                                <td>Can Yılmaz</td>
+                                <td>760.02</td>
+                                <td><strong>₺8,900.00</strong></td>
+                                <td>FLO Mağazacılık</td>
+                                <td>10 Ara 2024</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-select" checked></td>
+                                <td><strong>MSR-2024-0053</strong></td>
+                                <td>Elif Öztürk</td>
+                                <td>770.04</td>
+                                <td><strong>₺15,600.00</strong></td>
+                                <td>FLO Teknoloji</td>
+                                <td>9 Ara 2024</td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" class="row-select" checked></td>
+                                <td><strong>MSR-2024-0051</strong></td>
+                                <td>Zeynep Arslan</td>
+                                <td>770.05</td>
+                                <td><strong>₺4,500.00</strong></td>
+                                <td>Turuncu</td>
+                                <td>9 Ara 2024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Son Aktarımlar -->
+            <h2 style="font-size: 18px; margin: 30px 0 20px;">Son SAP Aktarımları</h2>
+
+            <div class="sap-card">
+                <div class="sap-list-header">
+                    <div>
+                        <div class="sap-list-title">EBA2SAP-2024-12-09</div>
+                        <div class="sap-list-meta">15 masraf - ₺45,230.00 - 9 Aralık 2024 14:30</div>
+                    </div>
+                    <span class="status-badge status-approved">Aktarıldı</span>
+                </div>
+            </div>
+
+            <div class="sap-card">
+                <div class="sap-list-header">
+                    <div>
+                        <div class="sap-list-title">EBA2SAP-2024-12-08</div>
+                        <div class="sap-list-meta">12 masraf - ₺32,150.00 - 8 Aralık 2024 16:45</div>
+                    </div>
+                    <span class="status-badge status-approved">Aktarıldı</span>
+                </div>
+            </div>
+
+            <div class="sap-card">
+                <div class="sap-list-header">
+                    <div>
+                        <div class="sap-list-title">EBA2SAP-2024-12-07</div>
+                        <div class="sap-list-meta">8 masraf - ₺18,900.00 - 7 Aralık 2024 11:20</div>
+                    </div>
+                    <span class="status-badge status-approved">Aktarıldı</span>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div style="margin-top: 30px; background: linear-gradient(135deg, #107C41, #1DB954); border-radius: 16px; padding: 24px; color: white;">
+                <h3 style="font-size: 18px; margin-bottom: 12px;">📌 SAP Aktarım Notları</h3>
+                <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                    <li>EBA2SAP dosyası günde bir kez oluşturulmalıdır.</li>
+                    <li>Aktarım öncesi tüm hesap kodlarının doğru olduğundan emin olunuz.</li>
+                    <li>SAP'ye aktarılan masraflar geri alınamaz.</li>
+                    <li>Aktarım dosyası Excel formatında indirilir.</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function toggleAllCheckboxes(source) {
+            const checkboxes = document.querySelectorAll('.row-select');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
+        function createSAPExport() {
+            const checked = document.querySelectorAll('.row-select:checked');
+            if (checked.length === 0) {
+                alert('Lütfen en az bir masraf seçiniz.');
+                return;
+            }
+
+            if (confirm(`${checked.length} adet masraf için SAP aktarım dosyası (EBA2SAP) oluşturulacak. Devam etmek istiyor musunuz?`)) {
+                showAlert('success', `EBA2SAP dosyası başarıyla oluşturuldu! ${checked.length} masraf SAP'ye aktarım için hazır.`);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onay Bekleyenler - FLOConnect</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 7 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar">MY</div>
+                <div class="user-name">Mehmet Yılmaz</div>
+                <div class="user-title">Direktör</div>
+                <div class="user-role">Dijital Ürünler</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="yonetici-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="onay-listesi.html" class="nav-link active">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">7</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html?view=all" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Tüm Masraflar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html" class="nav-link">
+                        <span class="nav-icon">🧾</span>
+                        Masraf Girişi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📈</span>
+                        Raporlar
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="yonetici-anasayfa.html">Anasayfa</a>
+                <span>›</span>
+                <span>Onay Bekleyenler</span>
+            </div>
+
+            <div class="content-header">
+                <h1 class="page-title">Onay Bekleyen Masraflar</h1>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-outline" style="padding: 10px 16px;" onclick="bulkApprove()">
+                        ✓ Toplu Onayla
+                    </button>
+                    <button class="btn-secondary" style="padding: 10px 16px;">
+                        📊 Excel'e Aktar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--warning-red);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--warning-red);">7</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Onay Bekleyen</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-orange);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">₺24,850</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Toplam Tutar</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #856404;">
+                    <div style="font-size: 28px; font-weight: 700; color: #856404;">2</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Limit Üstü</div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-controls">
+                    <div class="form-group" style="min-width: 200px;">
+                        <input type="text" class="form-input" placeholder="🔍 Çalışan adı veya talep no ara...">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select">
+                            <option value="">Tüm Çalışanlar</option>
+                            <option value="ayse">Ayşe Kaya</option>
+                            <option value="can">Can Yılmaz</option>
+                            <option value="elif">Elif Öztürk</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select">
+                            <option value="">Tüm Tutarlar</option>
+                            <option value="0-1000">0 - 1.000 TL</option>
+                            <option value="1000-5000">1.000 - 5.000 TL</option>
+                            <option value="5000-10000">5.000 - 10.000 TL</option>
+                            <option value="10000+">10.000 TL+</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th>Talep No</th>
+                            <th>Çalışan</th>
+                            <th>Belge Türü</th>
+                            <th>Açıklama</th>
+                            <th>Tutar</th>
+                            <th>Tarih</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0048</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">AK</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Ayşe Kaya</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Kıdemli Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fatura</td>
+                            <td>Müşteri toplantısı yemek masrafı</td>
+                            <td><strong>₺1,250.00</strong></td>
+                            <td>10 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0048')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0048')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0048')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0047</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">CY</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Can Yılmaz</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fiş</td>
+                            <td>İş seyahati - Taksi masrafı</td>
+                            <td><strong>₺350.00</strong></td>
+                            <td>9 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0047')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0047')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0047')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0046</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">EÖ</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Elif Öztürk</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Kıdemli Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fatura</td>
+                            <td>Ofis malzemesi alımı</td>
+                            <td><strong>₺2,800.00</strong></td>
+                            <td>8 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0046')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0046')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0046')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background: #FFF5F5;">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td>
+                                <strong>MSR-2024-0044</strong>
+                                <span style="display: block; font-size: 10px; color: var(--warning-red);">⚠️ Limit Üstü</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">BT</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Berat Tanrıverdi</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Kıdemli Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Yurtdışı Fatura</td>
+                            <td>Yurtdışı konferans kayıt ücreti</td>
+                            <td><strong style="color: var(--warning-red);">₺8,750.00</strong></td>
+                            <td>4 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0044')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0044')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0044')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0043</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">SA</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Selin Aydın</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fatura</td>
+                            <td>Yazılım lisans yenileme</td>
+                            <td><strong>₺4,200.00</strong></td>
+                            <td>3 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0043')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0043')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0043')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background: #FFF5F5;">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td>
+                                <strong>MSR-2024-0042</strong>
+                                <span style="display: block; font-size: 10px; color: var(--warning-red);">⚠️ Limit Üstü</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">MK</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Murat Koç</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Müdür</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fatura</td>
+                            <td>Ekipman alımı - Sunucu donanımı</td>
+                            <td><strong style="color: var(--warning-red);">₺12,500.00</strong></td>
+                            <td>2 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0042')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0042')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0042')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0041</strong></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy)); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">ZD</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Zeynep Demir</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Uzman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Fiş</td>
+                            <td>Kargo gönderim masrafı</td>
+                            <td><strong>₺150.00</strong></td>
+                            <td>1 Ara 2024</td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay" onclick="showDetail('0041')">👁️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveRequest('0041')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="rejectRequest('0041')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">›</button>
+            </div>
+
+            <!-- Info Box -->
+            <div style="margin-top: 30px; background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 12px; padding: 20px;">
+                <h4 style="color: #856404; margin-bottom: 8px;">📋 Onay Yetkiniz Hakkında</h4>
+                <p style="font-size: 14px; color: #856404; line-height: 1.6;">
+                    4. Derece (Direktör) olarak <strong>7.500 TL - 50.000 TL</strong> arası masrafları onaylayabilirsiniz.<br>
+                    50.000 TL üzeri masraflar GMY (3. Derece) onayına yönlendirilecektir.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-select');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        function bulkApprove() {
+            const selected = document.querySelectorAll('.row-select:checked');
+            if (selected.length === 0) {
+                alert('Lütfen onaylanacak masrafları seçiniz.');
+                return;
+            }
+            if (confirm(`${selected.length} adet masrafı onaylamak istediğinize emin misiniz?`)) {
+                showAlert('success', `${selected.length} masraf başarıyla onaylandı.`);
+            }
+        }
+
+        function showDetail(id) {
+            window.location.href = `masraf-detay.html?id=${id}&role=manager`;
+        }
+    </script>
+</body>
+</html>

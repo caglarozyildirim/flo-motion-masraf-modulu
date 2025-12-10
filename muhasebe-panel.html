@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhasebe Paneli - FLOConnect</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .muhasebe-header {
+            background: linear-gradient(90deg, #107C41 0%, #1DB954 100%);
+        }
+        .stat-card.muhasebe {
+            border-left-color: #107C41;
+        }
+        .btn-sap {
+            background: #107C41;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-sap:hover {
+            background: #0D5F31;
+        }
+        .edit-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--warning-yellow);
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header muhasebe-header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span> <span style="font-size: 14px; opacity: 0.8;">Muhasebe</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 12 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #107C41, #1DB954);">FA</div>
+                <div class="user-name">Fatma Aktaş</div>
+                <div class="user-title">Muhasebe Uzmanı</div>
+                <div class="user-role">Muhasebe Departmanı</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="muhasebe-panel.html" class="nav-link active">
+                        <span class="nav-icon">🏠</span>
+                        Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onay-bekleyenler.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onaylananlar.html" class="nav-link">
+                        <span class="nav-icon">✅</span>
+                        Onaylananlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-sap-aktarim.html" class="nav-link">
+                        <span class="nav-icon">📤</span>
+                        SAP Aktarım (EBA2SAP)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-raporlar.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-hesap-eslestirme.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Hesap Eşleştirme
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <h1 class="page-title">Muhasebe Kontrol Paneli</h1>
+
+            <!-- Dashboard Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--warning-red);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--warning-red);">12</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Muhasebe Onayı Bekleyen</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid #107C41;">
+                    <div style="font-size: 32px; font-weight: 700; color: #107C41;">8</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">SAP'ye Aktarım Bekleyen</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--primary-orange);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">₺156,420</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Bu Ay Toplam</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--success-dark);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--success-dark);">45</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Bu Ay İşlenen</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(this, 'waiting')" data-tab="waiting">Muhasebe Onayı (<span id="countWaiting">12</span>)</div>
+                <div class="tab" onclick="switchTab(this, 'sap')" data-tab="sap">SAP Aktarım Bekleyen (<span id="countSap">8</span>)</div>
+                <div class="tab" onclick="switchTab(this, 'edit')" data-tab="edit">Düzenleme Gerektiren (<span id="countEdit">3</span>)</div>
+                <div class="tab" onclick="switchTab(this, 'completed')" data-tab="completed">Tamamlanan</div>
+            </div>
+
+            <!-- Action Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="text" class="form-input" id="searchInput" placeholder="🔍 Ara..." style="width: 250px;" oninput="applyFilters()">
+                    <select class="form-select" id="companySelect" onchange="applyFilters()">
+                        <option value="">Tüm Şirketler</option>
+                        <option value="FLO Mağazacılık">FLO Mağazacılık</option>
+                        <option value="Turuncu">Turuncu</option>
+                        <option value="FLO Teknoloji">FLO Teknoloji</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-outline" style="padding: 10px 16px;" onclick="bulkApprove()">
+                        ✓ Toplu Onayla
+                    </button>
+                    <button class="btn-sap" onclick="createSAPList()">
+                        📤 EBA2SAP Listesi Oluştur
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox"></th>
+                            <th>Talep No</th>
+                            <th>Çalışan / Departman</th>
+                            <th>Belge Bilgisi</th>
+                            <th>Hesap Kodu</th>
+                            <th>Tutar</th>
+                            <th>Şirket</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody">
+                        <tr id="row-0055" data-status="waiting" data-company="FLO Mağazacılık">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0055</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Ayşe Kaya</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Dijital Ürünler</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12548</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">ABC Teknoloji A.Ş.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px;" id="hesap-0055">
+                                    <option value="770.04" selected>770.04 - Ofis Malz.</option>
+                                    <option value="770.01">770.01 - Yemek</option>
+                                    <option value="770.02">770.02 - Ulaşım</option>
+                                </select>
+                            </td>
+                            <td><strong>₺2,450.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span class="status-badge status-waiting" id="status-0055">Kontrol Bekliyor</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Düzenle" onclick="openEditModal('0055', 'Ayşe Kaya', '₺2,450.00', 'ABC Teknoloji A.Ş.')">✏️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveExpense('0055')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="openRejectModal('0055')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background: #FFF8E1;" id="row-0054" data-status="edit" data-company="FLO Mağazacılık">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td>
+                                <strong>MSR-2024-0054</strong>
+                                <span class="edit-indicator" title="Düzenleme yapıldı"></span>
+                            </td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Can Yılmaz</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Pazarlama</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12547</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">XYZ Reklam Ltd.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px; border-color: var(--warning-yellow);" id="hesap-0054">
+                                    <option value="760.02" selected>760.02 - Tanıtım</option>
+                                    <option value="760.01">760.01 - Mağaza</option>
+                                </select>
+                            </td>
+                            <td><strong>₺8,900.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span class="status-badge status-pending" id="status-0054">Düzenlendi</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Düzenle" onclick="openEditModal('0054', 'Can Yılmaz', '₺8,900.00', 'XYZ Reklam Ltd.')">✏️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveExpense('0054')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="openRejectModal('0054')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="row-0053" data-status="waiting" data-company="FLO Teknoloji">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0053</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Elif Öztürk</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">IT</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12546</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Bulut Sistem A.Ş.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px;" id="hesap-0053">
+                                    <option value="770.04" selected>770.04 - Ofis Malz.</option>
+                                </select>
+                            </td>
+                            <td><strong>₺15,600.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Teknoloji</span></td>
+                            <td><span class="status-badge status-waiting" id="status-0053">Kontrol Bekliyor</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Düzenle" onclick="openEditModal('0053', 'Elif Öztürk', '₺15,600.00', 'Bulut Sistem A.Ş.')">✏️</button>
+                                    <button class="icon-btn" style="background: var(--success-green);" title="Onayla" onclick="approveExpense('0053')">✓</button>
+                                    <button class="icon-btn" style="background: var(--reject-red);" title="Reddet" onclick="openRejectModal('0053')">✕</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="background: #FFEBEE;" id="row-0052" data-status="cari" data-company="FLO Teknoloji">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td>
+                                <strong>MSR-2024-0052</strong>
+                                <span style="display: block; font-size: 10px; color: var(--reject-dark);">⚠️ Cari Eksik</span>
+                            </td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Berat Tanrıverdi</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">UX</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12545</div>
+                                <div style="font-size: 11px; color: var(--reject-dark);">⚠️ Yeni Tedarikçi Ltd.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px;" id="hesap-0052">
+                                    <option value="770.01" selected>770.01 - Yemek</option>
+                                </select>
+                            </td>
+                            <td><strong>₺1,250.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Teknoloji</span></td>
+                            <td><span class="status-badge status-rejected" id="status-0052">Cari Gerekli</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Cari Talep Oluştur" style="background: #FFF3CD;" onclick="createCariRequest('0052')">📋</button>
+                                    <button class="icon-btn" title="Düzenle" onclick="openEditModal('0052', 'Berat Tanrıverdi', '₺1,250.00', 'Yeni Tedarikçi Ltd.')">✏️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- SAP Aktarım Bekleyen -->
+                        <tr id="row-0051" data-status="approved" data-company="FLO Mağazacılık" style="background: #E8F5E9;">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0051</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Ahmet Demir</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Satış</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12544</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Kargo A.Ş.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px;" id="hesap-0051">
+                                    <option value="770.03" selected>770.03 - Kargo</option>
+                                </select>
+                            </td>
+                            <td><strong>₺680.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span class="status-badge status-approved" id="status-0051">SAP Bekliyor</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay">👁️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="row-0050" data-status="approved" data-company="Turuncu" style="background: #E8F5E9;">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td><strong>MSR-2024-0050</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Zeynep Arslan</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">İK</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12543</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Eğitim Ltd.</div>
+                            </td>
+                            <td>
+                                <select class="form-select" style="font-size: 12px; padding: 6px;" id="hesap-0050">
+                                    <option value="770.05" selected>770.05 - Eğitim</option>
+                                </select>
+                            </td>
+                            <td><strong>₺4,500.00</strong></td>
+                            <td><span style="font-size: 12px;">Turuncu</span></td>
+                            <td><span class="status-badge status-approved" id="status-0050">SAP Bekliyor</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay">👁️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Tamamlanan -->
+                        <tr id="row-0049" data-status="completed" data-company="FLO Teknoloji">
+                            <td><input type="checkbox" class="row-select" disabled></td>
+                            <td><strong>MSR-2024-0049</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Murat Yıldız</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Yazılım</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12542</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Bulut Hizmetleri</div>
+                            </td>
+                            <td>
+                                <span style="font-size: 12px; padding: 6px;">770.06 - Yazılım</span>
+                            </td>
+                            <td><strong>₺12,000.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Teknoloji</span></td>
+                            <td><span class="status-badge status-approved" id="status-0049">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay">👁️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="row-0048" data-status="rejected" data-company="FLO Mağazacılık" style="background: #FFEBEE;">
+                            <td><input type="checkbox" class="row-select" disabled></td>
+                            <td><strong>MSR-2024-0048</strong></td>
+                            <td>
+                                <div>
+                                    <div style="font-weight: 500;">Seda Kara</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Finans</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12541</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Bilinmeyen Firma</div>
+                            </td>
+                            <td>
+                                <span style="font-size: 12px; padding: 6px;">770.01 - Yemek</span>
+                            </td>
+                            <td><strong>₺890.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span class="status-badge status-rejected" id="status-0048">Reddedildi</span></td>
+                            <td>
+                                <div class="action-icons">
+                                    <button class="icon-btn" title="Detay">👁️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">›</button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div style="background: white; border-radius: 12px; padding: 24px;">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 24px;">📤</span> EBA2SAP İşlemleri
+                    </h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Onaylanan masrafları SAP'ye aktarmak için liste oluşturun.
+                    </p>
+                    <button class="btn-sap" style="width: 100%; justify-content: center;">
+                        SAP Aktarım Listesi Oluştur
+                    </button>
+                </div>
+
+                <div style="background: white; border-radius: 12px; padding: 24px;" id="reportsSection">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 24px;">📊</span> Raporlar
+                    </h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Masraf raporlarını görüntüleyin ve indirin.
+                    </p>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-outline" style="flex: 1; padding: 10px;">Günlük</button>
+                        <button class="btn-outline" style="flex: 1; padding: 10px;">Aylık</button>
+                        <button class="btn-outline" style="flex: 1; padding: 10px;">Yıllık</button>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 12px; padding: 24px;" id="hesapSection">
+                    <h3 style="font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 24px;">⚙️</span> Hesap Eşleştirme
+                    </h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                        Masraf türü - hesap kodu eşleştirmelerini yönetin.
+                    </p>
+                    <button class="btn-secondary" style="width: 100%;">
+                        Eşleştirme Tablosu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Info Box -->
+            <div style="margin-top: 30px; background: linear-gradient(135deg, #107C41, #1DB954); border-radius: 16px; padding: 24px; color: white;">
+                <h3 style="font-size: 18px; margin-bottom: 12px;">📌 Muhasebe Kontrol Notları</h3>
+                <ul style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                    <li>Carisi olmayan faturalar için "Cari Talep Oluştur" butonunu kullanınız.</li>
+                    <li>Hesap kodu değişikliklerinde açıklama girilmesi zorunludur.</li>
+                    <li>EBA2SAP listesi oluşturmadan önce "SAP'ye Gönder" butonuna tıklamayı unutmayınız.</li>
+                    <li>Mükerrer fatura kontrolü sistem tarafından otomatik yapılmaktadır.</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <!-- Düzenleme Modal -->
+    <div class="modal-overlay" id="editModal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #107C41, #1DB954); color: white; border-radius: 16px 16px 0 0;">
+                <h3>✏️ Masraf Düzenleme</h3>
+                <button class="modal-close" onclick="closeEditModal()" style="color: white;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <div style="background: #F8F9FA; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Talep No</span>
+                            <div style="font-weight: 600;" id="editTalepNo">MSR-2024-0055</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Çalışan</span>
+                            <div style="font-weight: 600;" id="editCalisan">Ayşe Kaya</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Tutar</span>
+                            <div style="font-weight: 600;" id="editTutar">₺2,450.00</div>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Firma</span>
+                            <div style="font-weight: 600;" id="editFirma">ABC Teknoloji A.Ş.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hesap Kodu</label>
+                    <select class="form-select" id="editHesapKodu">
+                        <option value="770.01">770.01 - Yemek Giderleri</option>
+                        <option value="770.02">770.02 - Ulaşım Giderleri</option>
+                        <option value="770.03">770.03 - Kargo ve Posta</option>
+                        <option value="770.04">770.04 - Ofis Malzemesi</option>
+                        <option value="770.05">770.05 - Eğitim ve Konferans</option>
+                        <option value="770.06">770.06 - Yazılım ve Lisans</option>
+                        <option value="770.07">770.07 - Taşıt Gideri</option>
+                        <option value="760.01">760.01 - Mağaza Giderleri</option>
+                        <option value="760.02">760.02 - Tanıtım Giderleri</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tutar Düzeltmesi (İsteğe bağlı)</label>
+                    <input type="number" class="form-input" id="editTutarInput" placeholder="Yeni tutar giriniz...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Düzenleme Nedeni <span style="color: var(--warning-red);">*</span></label>
+                    <textarea class="form-textarea" id="editNeden" rows="3" placeholder="Düzenleme nedenini açıklayınız..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border-color);">
+                <button class="btn-secondary" onclick="closeEditModal()">İptal</button>
+                <button class="btn-sap" onclick="saveEdit()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Red Modal -->
+    <div class="modal-overlay" id="rejectModal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border-radius: 16px 16px 0 0;">
+                <h3>❌ Masraf Reddi</h3>
+                <button class="modal-close" onclick="closeRejectModal()" style="color: white;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <p style="margin-bottom: 16px;">Masraf talebini reddetmek istediğinize emin misiniz?</p>
+                <div style="background: #FFF5F5; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                    <strong id="rejectTalepNo">MSR-2024-0055</strong>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Red Nedeni <span style="color: var(--warning-red);">*</span></label>
+                    <select class="form-select" id="rejectReason">
+                        <option value="">Seçiniz...</option>
+                        <option value="belge_eksik">Belge eksik veya okunamıyor</option>
+                        <option value="tutar_uyumsuz">Tutar uyuşmazlığı</option>
+                        <option value="hesap_hatali">Yanlış hesap kodu</option>
+                        <option value="cari_eksik">Cari hesap eksik</option>
+                        <option value="mukerrer">Mükerrer fatura</option>
+                        <option value="politika_disi">Şirket politikasına aykırı</option>
+                        <option value="diger">Diğer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Açıklama</label>
+                    <textarea class="form-textarea" id="rejectNote" rows="3" placeholder="Ek açıklama giriniz..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border-color);">
+                <button class="btn-secondary" onclick="closeRejectModal()">İptal</button>
+                <button class="btn-reject" onclick="confirmReject()" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">Reddet</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Current expense ID being edited/rejected
+        let currentExpenseId = null;
+
+        // =====================
+        // DÜZENLEME FONKSİYONLARI
+        // =====================
+        function openEditModal(id, calisan, tutar, firma) {
+            currentExpenseId = id;
+            document.getElementById('editTalepNo').textContent = 'MSR-2024-' + id;
+            document.getElementById('editCalisan').textContent = calisan;
+            document.getElementById('editTutar').textContent = tutar;
+            document.getElementById('editFirma').textContent = firma;
+
+            // Mevcut hesap kodunu seç
+            const currentHesap = document.getElementById('hesap-' + id);
+            if (currentHesap) {
+                document.getElementById('editHesapKodu').value = currentHesap.value;
+            }
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editNeden').value = '';
+            document.getElementById('editTutarInput').value = '';
+            currentExpenseId = null;
+        }
+
+        function saveEdit() {
+            const neden = document.getElementById('editNeden').value;
+            const yeniHesapKodu = document.getElementById('editHesapKodu').value;
+
+            if (!neden.trim()) {
+                alert('Lütfen düzenleme nedenini giriniz.');
+                return;
+            }
+
+            // Hesap kodunu güncelle
+            const hesapSelect = document.getElementById('hesap-' + currentExpenseId);
+            if (hesapSelect) {
+                hesapSelect.value = yeniHesapKodu;
+                hesapSelect.style.borderColor = 'var(--warning-yellow)';
+            }
+
+            // Satırı vurgula
+            const row = document.getElementById('row-' + currentExpenseId);
+            if (row) {
+                row.style.background = '#FFF8E1';
+            }
+
+            // Durumu güncelle
+            const status = document.getElementById('status-' + currentExpenseId);
+            if (status) {
+                status.textContent = 'Düzenlendi';
+                status.className = 'status-badge status-pending';
+            }
+
+            closeEditModal();
+            showAlert('success', `MSR-2024-${currentExpenseId} masrafı düzenlendi.`);
+        }
+
+        // =====================
+        // ONAYLAMA FONKSİYONLARI
+        // =====================
+        function approveExpense(id) {
+            if (confirm(`MSR-2024-${id} numaralı masrafı onaylamak istediğinize emin misiniz?`)) {
+                // Durumu güncelle
+                const status = document.getElementById('status-' + id);
+                if (status) {
+                    status.textContent = 'Onaylandı';
+                    status.className = 'status-badge status-approved';
+                }
+
+                // Satır stilini güncelle
+                const row = document.getElementById('row-' + id);
+                if (row) {
+                    row.style.background = '#E8F5E9';
+                }
+
+                showAlert('success', `MSR-2024-${id} masrafı başarıyla onaylandı ve SAP aktarım listesine eklendi.`);
+            }
+        }
+
+        // =====================
+        // RED FONKSİYONLARI
+        // =====================
+        function openRejectModal(id) {
+            currentExpenseId = id;
+            document.getElementById('rejectTalepNo').textContent = 'MSR-2024-' + id;
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectNote').value = '';
+            currentExpenseId = null;
+        }
+
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value;
+
+            if (!reason) {
+                alert('Lütfen red nedenini seçiniz.');
+                return;
+            }
+
+            // Durumu güncelle
+            const status = document.getElementById('status-' + currentExpenseId);
+            if (status) {
+                status.textContent = 'Reddedildi';
+                status.className = 'status-badge status-rejected';
+            }
+
+            // Satır stilini güncelle
+            const row = document.getElementById('row-' + currentExpenseId);
+            if (row) {
+                row.style.background = '#FFEBEE';
+            }
+
+            closeRejectModal();
+            showAlert('error', `MSR-2024-${currentExpenseId} masrafı reddedildi.`);
+        }
+
+        // =====================
+        // CARİ TALEP FONKSİYONU
+        // =====================
+        function createCariRequest(id) {
+            if (confirm(`MSR-2024-${id} için cari hesap açılış talebi oluşturulacak. Devam etmek istiyor musunuz?`)) {
+                showAlert('success', `MSR-2024-${id} için cari hesap açılış talebi oluşturuldu ve ilgili birime iletildi.`);
+            }
+        }
+
+        // =====================
+        // TOPLU İŞLEMLER
+        // =====================
+        function bulkApprove() {
+            const checkboxes = document.querySelectorAll('.row-select:checked');
+            if (checkboxes.length === 0) {
+                alert('Lütfen en az bir masraf seçiniz.');
+                return;
+            }
+
+            if (confirm(`${checkboxes.length} adet masrafı onaylamak istediğinize emin misiniz?`)) {
+                checkboxes.forEach(cb => {
+                    const row = cb.closest('tr');
+                    const statusBadge = row.querySelector('.status-badge');
+                    if (statusBadge) {
+                        statusBadge.textContent = 'Onaylandı';
+                        statusBadge.className = 'status-badge status-approved';
+                    }
+                    row.style.background = '#E8F5E9';
+                    cb.checked = false;
+                });
+
+                showAlert('success', `${checkboxes.length} masraf başarıyla onaylandı.`);
+            }
+        }
+
+        // =====================
+        // SAP LİSTESİ OLUŞTURMA
+        // =====================
+        function createSAPList() {
+            // Onaylanan masrafları say
+            const approvedRows = document.querySelectorAll('.status-badge.status-approved');
+
+            if (approvedRows.length === 0) {
+                alert('SAP aktarım listesi için önce masrafları onaylamanız gerekmektedir.');
+                return;
+            }
+
+            if (confirm(`${approvedRows.length} adet onaylı masraf için SAP aktarım listesi (EBA2SAP) oluşturulacak. Devam etmek istiyor musunuz?`)) {
+                showAlert('success', `EBA2SAP listesi başarıyla oluşturuldu! ${approvedRows.length} masraf SAP'ye aktarım için hazır.`);
+            }
+        }
+
+        // =====================
+        // TAB VE FİLTRE FONKSİYONLARI
+        // =====================
+        let currentTab = 'waiting';
+
+        function switchTab(element, tabName) {
+            // Tüm tab'lardan active class'ı kaldır
+            document.querySelectorAll('.tabs .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Tıklanan tab'a active class'ı ekle
+            element.classList.add('active');
+
+            currentTab = tabName;
+            applyFilters();
+
+            // Sidebar aktif linkini güncelle
+            updateSidebarActiveLink(tabName);
+        }
+
+        function applyFilters() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const companyValue = document.getElementById('companySelect').value;
+            const rows = document.querySelectorAll('#expenseTableBody tr');
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                const rowCompany = row.getAttribute('data-company');
+                const rowText = row.textContent.toLowerCase();
+
+                // Tab filtresi
+                let tabMatch = false;
+                if (currentTab === 'waiting') {
+                    tabMatch = rowStatus === 'waiting';
+                } else if (currentTab === 'sap') {
+                    tabMatch = rowStatus === 'approved' || rowStatus === 'sap';
+                } else if (currentTab === 'edit') {
+                    tabMatch = rowStatus === 'edit' || rowStatus === 'cari';
+                } else if (currentTab === 'completed') {
+                    tabMatch = rowStatus === 'completed' || rowStatus === 'rejected';
+                } else {
+                    tabMatch = true;
+                }
+
+                // Arama filtresi
+                const searchMatch = searchValue === '' || rowText.includes(searchValue);
+
+                // Şirket filtresi
+                const companyMatch = companyValue === '' || rowCompany === companyValue;
+
+                // Tüm filtreler eşleşirse göster
+                if (tabMatch && searchMatch && companyMatch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Sonuç yoksa mesaj göster
+            showNoResultsMessage(visibleCount);
+        }
+
+        function showNoResultsMessage(count) {
+            let noResultsRow = document.getElementById('noResultsRow');
+
+            if (count === 0) {
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.id = 'noResultsRow';
+                    noResultsRow.innerHTML = '<td colspan="9" style="text-align: center; padding: 40px; color: var(--text-secondary);">Aramanıza uygun sonuç bulunamadı.</td>';
+                    document.getElementById('expenseTableBody').appendChild(noResultsRow);
+                }
+                noResultsRow.style.display = '';
+            } else if (noResultsRow) {
+                noResultsRow.style.display = 'none';
+            }
+        }
+
+        // =====================
+        // SIDEBAR NAVİGASYON FONKSİYONLARI
+        // =====================
+        function navigateToTab(tabName) {
+            const tabElement = document.querySelector(`.tabs .tab[data-tab="${tabName}"]`);
+            if (tabElement) {
+                switchTab(tabElement, tabName);
+                // Tabloya scroll et
+                document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function updateSidebarActiveLink(tabName) {
+            // Tüm nav-link'lerden active class'ı kaldır (Panel hariç)
+            document.querySelectorAll('.nav-menu .nav-link').forEach(link => {
+                if (link.id !== 'navPanel') {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function scrollToReports() {
+            const reportsSection = document.getElementById('reportsSection');
+            if (reportsSection) {
+                reportsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                showAlert('info', 'Raporlar bölümü yakında eklenecektir.');
+            }
+        }
+
+        function scrollToHesapEslestirme() {
+            const hesapSection = document.getElementById('hesapSection');
+            if (hesapSection) {
+                hesapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                showAlert('info', 'Hesap Eşleştirme bölümü yakında eklenecektir.');
+            }
+        }
+
+        // Sayfa yüklendiğinde ilk tab'ı uygula
+        document.addEventListener('DOMContentLoaded', function() {
+            applyFilters();
+        });
+    </script>
+
+    <style>
+        /* Modal Stilleri */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .btn-secondary {
+            padding: 12px 24px;
+            background: #F8F9FA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-secondary:hover {
+            background: #E9ECEF;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .btn-reject {
+            transition: all 0.2s;
+        }
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+    </style>
+</body>
+</html>

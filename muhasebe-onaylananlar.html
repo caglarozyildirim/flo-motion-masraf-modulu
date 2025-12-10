@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onaylananlar - Muhasebe Paneli</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .muhasebe-header {
+            background: linear-gradient(90deg, #107C41 0%, #1DB954 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header muhasebe-header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span> <span style="font-size: 14px; opacity: 0.8;">Muhasebe</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 12 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #107C41, #1DB954);">FA</div>
+                <div class="user-name">Fatma Aktaş</div>
+                <div class="user-title">Muhasebe Uzmanı</div>
+                <div class="user-role">Muhasebe Departmanı</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="muhasebe-panel.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onay-bekleyenler.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onaylananlar.html" class="nav-link active">
+                        <span class="nav-icon">✅</span>
+                        Onaylananlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-sap-aktarim.html" class="nav-link">
+                        <span class="nav-icon">📤</span>
+                        SAP Aktarım (EBA2SAP)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-raporlar.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-hesap-eslestirme.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Hesap Eşleştirme
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="muhasebe-panel.html">Panel</a>
+                <span>›</span>
+                <span>Onaylananlar</span>
+            </div>
+
+            <h1 class="page-title">Onaylanan Masraflar</h1>
+
+            <!-- Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--success-dark);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--success-dark);">45</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Bu Ay Onaylanan</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #107C41;">
+                    <div style="font-size: 28px; font-weight: 700; color: #107C41;">38</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">SAP'ye Aktarılan</div>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-orange);">
+                    <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">₺156,420</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Toplam Tutar</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <input type="text" class="form-input" id="searchInput" placeholder="🔍 Ara..." style="width: 250px;" oninput="filterTable()">
+                <select class="form-select" id="companySelect" onchange="filterTable()">
+                    <option value="">Tüm Şirketler</option>
+                    <option value="FLO Mağazacılık">FLO Mağazacılık</option>
+                    <option value="Turuncu">Turuncu</option>
+                    <option value="FLO Teknoloji">FLO Teknoloji</option>
+                </select>
+                <select class="form-select" id="monthSelect" onchange="filterTable()">
+                    <option value="">Tüm Aylar</option>
+                    <option value="12" selected>Aralık 2024</option>
+                    <option value="11">Kasım 2024</option>
+                    <option value="10">Ekim 2024</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Talep No</th>
+                            <th>Çalışan</th>
+                            <th>Belge Bilgisi</th>
+                            <th>Hesap Kodu</th>
+                            <th>Tutar</th>
+                            <th>Şirket</th>
+                            <th>Onay Tarihi</th>
+                            <th>SAP Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr data-company="FLO Mağazacılık">
+                            <td><strong>MSR-2024-0049</strong></td>
+                            <td>
+                                <div style="font-weight: 500;">Murat Yıldız</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Yazılım</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12542</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Bulut Hizmetleri</div>
+                            </td>
+                            <td><span style="font-size: 12px;">770.06 - Yazılım</span></td>
+                            <td><strong>₺12,000.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span style="font-size: 12px;">10 Ara 2024</span></td>
+                            <td><span class="status-badge status-approved">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <button class="icon-btn" title="Detay" onclick="showDetail('0049')">👁️</button>
+                            </td>
+                        </tr>
+                        <tr data-company="FLO Mağazacılık">
+                            <td><strong>MSR-2024-0048</strong></td>
+                            <td>
+                                <div style="font-weight: 500;">Ayşe Kaya</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Dijital Ürünler</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-00892</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Kebapçı Mahmut</div>
+                            </td>
+                            <td><span style="font-size: 12px;">770.01 - Yemek</span></td>
+                            <td><strong>₺1,250.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span style="font-size: 12px;">9 Ara 2024</span></td>
+                            <td><span class="status-badge status-approved">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <button class="icon-btn" title="Detay" onclick="showDetail('0048')">👁️</button>
+                            </td>
+                        </tr>
+                        <tr data-company="Turuncu">
+                            <td><strong>MSR-2024-0047</strong></td>
+                            <td>
+                                <div style="font-weight: 500;">Zeynep Arslan</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">İK</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12540</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Eğitim Ltd.</div>
+                            </td>
+                            <td><span style="font-size: 12px;">770.05 - Eğitim</span></td>
+                            <td><strong>₺4,500.00</strong></td>
+                            <td><span style="font-size: 12px;">Turuncu</span></td>
+                            <td><span style="font-size: 12px;">8 Ara 2024</span></td>
+                            <td><span class="status-badge status-approved">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <button class="icon-btn" title="Detay" onclick="showDetail('0047')">👁️</button>
+                            </td>
+                        </tr>
+                        <tr data-company="FLO Teknoloji">
+                            <td><strong>MSR-2024-0046</strong></td>
+                            <td>
+                                <div style="font-weight: 500;">Elif Öztürk</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">IT</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12539</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Kırtasiye Market</div>
+                            </td>
+                            <td><span style="font-size: 12px;">770.04 - Ofis Malz.</span></td>
+                            <td><strong>₺2,800.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Teknoloji</span></td>
+                            <td><span style="font-size: 12px;">7 Ara 2024</span></td>
+                            <td><span class="status-badge status-approved">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <button class="icon-btn" title="Detay" onclick="showDetail('0046')">👁️</button>
+                            </td>
+                        </tr>
+                        <tr data-company="FLO Mağazacılık">
+                            <td><strong>MSR-2024-0045</strong></td>
+                            <td>
+                                <div style="font-weight: 500;">Can Yılmaz</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Pazarlama</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 13px;">FTR-2024-12538</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">Taksi Hizmetleri</div>
+                            </td>
+                            <td><span style="font-size: 12px;">770.02 - Ulaşım</span></td>
+                            <td><strong>₺350.00</strong></td>
+                            <td><span style="font-size: 12px;">FLO Mağazacılık</span></td>
+                            <td><span style="font-size: 12px;">6 Ara 2024</span></td>
+                            <td><span class="status-badge status-approved">SAP'ye Aktarıldı</span></td>
+                            <td>
+                                <button class="icon-btn" title="Detay" onclick="showDetail('0045')">👁️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">›</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function filterTable() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const companyValue = document.getElementById('companySelect').value;
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const rowCompany = row.getAttribute('data-company');
+
+                const searchMatch = searchValue === '' || rowText.includes(searchValue);
+                const companyMatch = companyValue === '' || rowCompany === companyValue;
+
+                row.style.display = (searchMatch && companyMatch) ? '' : 'none';
+            });
+        }
+
+        function showDetail(id) {
+            window.location.href = `masraf-detay.html?id=${id}`;
+        }
+    </script>
+</body>
+</html>

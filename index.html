@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLOConnect - Masraf Modülü</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .profile-selection {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8E9EB 100%);
+            padding: 20px;
+        }
+        .selection-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        .main-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .main-title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-burgundy) 0%, var(--primary-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .main-title p {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+        .profile-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+            gap: 30px;
+            max-width: 100%;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+        .profile-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .profile-card.employee:hover {
+            border-color: var(--primary-orange);
+        }
+        .profile-card.manager:hover {
+            border-color: var(--primary-burgundy);
+        }
+        .profile-card.accounting:hover {
+            border-color: #107C41;
+        }
+        .profile-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+        .profile-card.employee .profile-icon {
+            background: linear-gradient(135deg, var(--primary-orange), #F4A460);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-card.manager .profile-icon {
+            background: linear-gradient(135deg, var(--primary-burgundy), #A0516D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-card.accounting .profile-icon {
+            background: linear-gradient(135deg, #107C41, #1DB954);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .profile-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .profile-description {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .profile-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .profile-features li {
+            padding: 10px 0;
+            font-size: 14px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .profile-features li::before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .profile-card.employee .profile-features li::before {
+            background: var(--primary-orange);
+            color: white;
+        }
+        .profile-card.manager .profile-features li::before {
+            background: var(--primary-burgundy);
+            color: white;
+        }
+        .profile-card.accounting .profile-features li::before {
+            background: #107C41;
+            color: white;
+        }
+        .profile-btn {
+            width: 100%;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+        }
+        .profile-card.employee .profile-btn {
+            background: linear-gradient(135deg, var(--primary-orange), #F4A460);
+        }
+        .profile-card.employee .profile-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(230, 126, 80, 0.4);
+        }
+        .profile-card.manager .profile-btn {
+            background: linear-gradient(135deg, var(--primary-burgundy), #A0516D);
+        }
+        .profile-card.manager .profile-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(139, 67, 103, 0.4);
+        }
+        .profile-card.accounting .profile-btn {
+            background: linear-gradient(135deg, #107C41, #1DB954);
+        }
+        .profile-card.accounting .profile-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(16, 124, 65, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .profile-cards {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .main-title h1 {
+                font-size: 36px;
+            }
+            .main-title p {
+                font-size: 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .profile-selection {
+                padding: 15px;
+            }
+            .main-title {
+                margin-bottom: 40px;
+            }
+            .main-title h1 {
+                font-size: 28px;
+            }
+            .profile-card {
+                padding: 28px 20px;
+                border-radius: 16px;
+            }
+            .profile-icon {
+                font-size: 48px;
+                margin-bottom: 16px;
+            }
+            .profile-title {
+                font-size: 20px;
+            }
+            .profile-description {
+                font-size: 14px;
+            }
+            .profile-features li {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-selection">
+        <div class="selection-container">
+            <div class="main-title">
+                <h1>FLOConnect</h1>
+                <p>Masraf Modülü - Profil Seçimi</p>
+            </div>
+
+            <div class="profile-cards">
+                <!-- Çalışan Profili -->
+                <div class="profile-card employee" onclick="window.location.href='calisan-anasayfa.html'">
+                    <div class="profile-icon">👤</div>
+                    <h2 class="profile-title">Çalışan Girişi</h2>
+                    <p class="profile-description">
+                        Masraf taleplerimi oluştur ve takip et
+                    </p>
+                    <ul class="profile-features">
+                        <li>Fiş/Fatura yükle ve OCR ile oku</li>
+                        <li>Masraf talebi oluştur</li>
+                        <li>Talep durumlarını takip et</li>
+                        <li>Taslak kaydet ve düzenle</li>
+                        <li>Geçmiş masrafları görüntüle</li>
+                    </ul>
+                    <a href="calisan-anasayfa.html" class="profile-btn">
+                        Çalışan Olarak Devam Et
+                    </a>
+                </div>
+
+                <!-- Yönetici Profili -->
+                <div class="profile-card manager" onclick="window.location.href='yonetici-anasayfa.html'">
+                    <div class="profile-icon">👔</div>
+                    <h2 class="profile-title">Yönetici Girişi</h2>
+                    <p class="profile-description">
+                        Ekip masraflarını onayla ve yönet
+                    </p>
+                    <ul class="profile-features">
+                        <li>Onay bekleyen masrafları görüntüle</li>
+                        <li>Masrafları onayla veya reddet</li>
+                        <li>Ekip masraf raporlarını incele</li>
+                        <li>Limit bazlı onay akışı yönetimi</li>
+                        <li>Excel export işlemleri</li>
+                    </ul>
+                    <a href="yonetici-anasayfa.html" class="profile-btn">
+                        Yönetici Olarak Devam Et
+                    </a>
+                </div>
+
+                <!-- Muhasebe Profili -->
+                <div class="profile-card accounting" onclick="window.location.href='muhasebe-panel.html'">
+                    <div class="profile-icon">📊</div>
+                    <h2 class="profile-title">Muhasebe Girişi</h2>
+                    <p class="profile-description">
+                        Masrafları kontrol et ve SAP'ye aktar
+                    </p>
+                    <ul class="profile-features">
+                        <li>Tüm masrafları görüntüle</li>
+                        <li>Hesap kodu eşleştirme</li>
+                        <li>SAP entegrasyonu (EBA2SAP)</li>
+                        <li>Masraf düzenleme yetkisi</li>
+                        <li>Muhasebe raporları</li>
+                    </ul>
+                    <a href="muhasebe-panel.html" class="profile-btn">
+                        Muhasebe Olarak Devam Et
+                    </a>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section" style="margin-top: 60px; text-align: center; color: var(--text-secondary);">
+                <p style="font-size: 14px;">
+                    <strong>Not:</strong> Bu sayfadan profilinize uygun girişi seçiniz. <br>
+                    Her profil için farklı yetkiler ve özellikler mevcuttur.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hesap Eşleştirme - Muhasebe Paneli</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .muhasebe-header {
+            background: linear-gradient(90deg, #107C41 0%, #1DB954 100%);
+        }
+        .btn-sap {
+            background: #107C41;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .btn-sap:hover {
+            background: #0D5F31;
+        }
+        .mapping-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .mapping-card:hover {
+            border-color: #107C41;
+        }
+        .mapping-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        .mapping-info {
+            flex: 1;
+        }
+        .mapping-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .mapping-code {
+            font-size: 14px;
+            color: #107C41;
+            font-weight: 500;
+        }
+        .mapping-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .mapping-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #F8F9FA;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header muhasebe-header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span> <span style="font-size: 14px; opacity: 0.8;">Muhasebe</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 12 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #107C41, #1DB954);">FA</div>
+                <div class="user-name">Fatma Aktaş</div>
+                <div class="user-title">Muhasebe Uzmanı</div>
+                <div class="user-role">Muhasebe Departmanı</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="muhasebe-panel.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onay-bekleyenler.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onaylananlar.html" class="nav-link">
+                        <span class="nav-icon">✅</span>
+                        Onaylananlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-sap-aktarim.html" class="nav-link">
+                        <span class="nav-icon">📤</span>
+                        SAP Aktarım (EBA2SAP)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-raporlar.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-hesap-eslestirme.html" class="nav-link active">
+                        <span class="nav-icon">⚙️</span>
+                        Hesap Eşleştirme
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="muhasebe-panel.html">Panel</a>
+                <span>›</span>
+                <span>Hesap Eşleştirme</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1 class="page-title" style="margin: 0;">Masraf Türü - Hesap Kodu Eşleştirme</h1>
+                <button class="btn-sap" onclick="openAddModal()">
+                    + Yeni Eşleştirme
+                </button>
+            </div>
+
+            <!-- Info Box -->
+            <div style="background: #E8F5E9; border: 1px solid #C8E6C9; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">💡</span>
+                    <div>
+                        <strong style="color: #2E7D32;">Hesap Eşleştirme Nedir?</strong>
+                        <p style="font-size: 13px; color: #388E3C; margin-top: 4px;">
+                            Masraf türleri ile SAP hesap kodları arasındaki eşleştirmeleri bu sayfadan yönetebilirsiniz.
+                            OCR ile okunan masraflar otomatik olarak bu eşleştirmelere göre kategorize edilir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div style="margin-bottom: 20px;">
+                <input type="text" class="form-input" id="searchInput" placeholder="🔍 Hesap kodu veya masraf türü ara..." style="max-width: 400px;" oninput="filterMappings()">
+            </div>
+
+            <!-- Mappings List -->
+            <div id="mappingsList">
+                <div class="mapping-card" data-code="770.01">
+                    <div class="mapping-icon">🍽️</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Yemek Giderleri</div>
+                        <div class="mapping-code">770.01</div>
+                        <div class="mapping-desc">Restoran, kafeterya, iş yemeği masrafları</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.01')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.01')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.02">
+                    <div class="mapping-icon">🚗</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Ulaşım Giderleri</div>
+                        <div class="mapping-code">770.02</div>
+                        <div class="mapping-desc">Taksi, toplu taşıma, araç kiralama masrafları</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.02')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.02')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.03">
+                    <div class="mapping-icon">📦</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Kargo ve Posta</div>
+                        <div class="mapping-code">770.03</div>
+                        <div class="mapping-desc">Kargo gönderim, posta, kurye masrafları</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.03')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.03')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.04">
+                    <div class="mapping-icon">📎</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Ofis Malzemesi</div>
+                        <div class="mapping-code">770.04</div>
+                        <div class="mapping-desc">Kırtasiye, ofis ekipmanları, sarf malzeme</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.04')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.04')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.05">
+                    <div class="mapping-icon">🎓</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Eğitim ve Konferans</div>
+                        <div class="mapping-code">770.05</div>
+                        <div class="mapping-desc">Seminer, konferans, eğitim programı ücretleri</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.05')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.05')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.06">
+                    <div class="mapping-icon">💻</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Yazılım ve Lisans</div>
+                        <div class="mapping-code">770.06</div>
+                        <div class="mapping-desc">Yazılım lisansları, SaaS abonelikleri, bulut hizmetleri</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.06')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.06')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="770.07">
+                    <div class="mapping-icon">⛽</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Taşıt Gideri</div>
+                        <div class="mapping-code">770.07</div>
+                        <div class="mapping-desc">Yakıt, araç bakım, otopark masrafları (%70 Gider / %30 KKEG)</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('770.07')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('770.07')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="760.01">
+                    <div class="mapping-icon">🏪</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Mağaza Giderleri</div>
+                        <div class="mapping-code">760.01</div>
+                        <div class="mapping-desc">Mağaza tefrişat, dekorasyon, tadilat masrafları</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('760.01')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('760.01')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="mapping-card" data-code="760.02">
+                    <div class="mapping-icon">📢</div>
+                    <div class="mapping-info">
+                        <div class="mapping-title">Tanıtım Giderleri</div>
+                        <div class="mapping-code">760.02</div>
+                        <div class="mapping-desc">Reklam, pazarlama, promosyon masrafları</div>
+                    </div>
+                    <div class="mapping-actions">
+                        <button class="icon-btn" title="Düzenle" onclick="editMapping('760.02')">✏️</button>
+                        <button class="icon-btn" style="background: var(--reject-red);" title="Sil" onclick="deleteMapping('760.02')">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="mappingModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Yeni Eşleştirme Ekle</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div style="padding: 24px;">
+                <div class="form-group">
+                    <label class="form-label">Hesap Kodu</label>
+                    <input type="text" class="form-input" id="hesapKodu" placeholder="Örn: 770.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Masraf Türü Adı</label>
+                    <input type="text" class="form-input" id="masrafTuru" placeholder="Örn: Yemek Giderleri">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Açıklama</label>
+                    <textarea class="form-input" id="aciklama" rows="3" placeholder="Bu masraf türüne dahil olan harcamalar..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">İkon</label>
+                    <select class="form-select" id="ikon">
+                        <option value="🍽️">🍽️ Yemek</option>
+                        <option value="🚗">🚗 Ulaşım</option>
+                        <option value="📦">📦 Kargo</option>
+                        <option value="📎">📎 Ofis</option>
+                        <option value="🎓">🎓 Eğitim</option>
+                        <option value="💻">💻 Yazılım</option>
+                        <option value="⛽">⛽ Yakıt</option>
+                        <option value="🏪">🏪 Mağaza</option>
+                        <option value="📢">📢 Tanıtım</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border-color);">
+                <button class="btn-secondary" onclick="closeModal()">İptal</button>
+                <button class="btn-sap" onclick="saveMapping()">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function filterMappings() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.mapping-card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(searchValue) ? '' : 'none';
+            });
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Yeni Eşleştirme Ekle';
+            document.getElementById('hesapKodu').value = '';
+            document.getElementById('masrafTuru').value = '';
+            document.getElementById('aciklama').value = '';
+            document.getElementById('mappingModal').style.display = 'flex';
+        }
+
+        function editMapping(code) {
+            document.getElementById('modalTitle').textContent = 'Eşleştirme Düzenle';
+            document.getElementById('hesapKodu').value = code;
+            document.getElementById('mappingModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('mappingModal').style.display = 'none';
+        }
+
+        function saveMapping() {
+            const hesapKodu = document.getElementById('hesapKodu').value;
+            const masrafTuru = document.getElementById('masrafTuru').value;
+
+            if (!hesapKodu || !masrafTuru) {
+                alert('Lütfen hesap kodu ve masraf türünü giriniz.');
+                return;
+            }
+
+            closeModal();
+            showAlert('success', 'Hesap eşleştirmesi kaydedildi.');
+        }
+
+        function deleteMapping(code) {
+            if (confirm(`${code} hesap kodunu silmek istediğinize emin misiniz?`)) {
+                showAlert('success', `${code} hesap eşleştirmesi silindi.`);
+            }
+        }
+    </script>
+</body>
+</html>

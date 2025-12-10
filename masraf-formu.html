@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masraf Formu - FLOConnect</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 Bildirimler</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar - Employee View -->
+        <aside class="sidebar" id="sidebarEmployee">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar">BT</div>
+                <div class="user-name">Berat Tanrıverdi</div>
+                <div class="user-title">Kıdemli Uzman</div>
+                <div class="user-role">Ürün Tasarım/UX Müd.</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="calisan-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html" class="nav-link active">
+                        <span class="nav-icon">🧾</span>
+                        Yeni Masraf Girişi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Masraf Taleplerim
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Sidebar - Manager View -->
+        <aside class="sidebar" id="sidebarManager" style="display: none;">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, var(--primary-burgundy), #A0516D);">MY</div>
+                <div class="user-name">Mehmet Yılmaz</div>
+                <div class="user-title">Dijital Ürünler Direktörü</div>
+                <div class="user-role" style="background: linear-gradient(135deg, var(--primary-burgundy), #A0516D); color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px;">4. Derece Onay Yetkisi</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="yonetici-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="onay-listesi.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">7</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html?view=all" class="nav-link">
+                        <span class="nav-icon">📋</span>
+                        Masraflarım
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html?view=team" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        Ekip Masrafları
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html?role=manager" class="nav-link active">
+                        <span class="nav-icon">🧾</span>
+                        Masraf Girişi
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="calisan-anasayfa.html">Anasayfa</a>
+                <span>›</span>
+                <span>Yeni Masraf Girişi</span>
+            </div>
+
+            <h1 class="page-title">Yeni Masraf Girişi</h1>
+
+            <!-- Warning Alert -->
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <strong>Önemli:</strong> Fiş veya fatura görselini yükleyiniz. OCR sistemi belgenizi otomatik olarak okuyacaktır.
+                    Okunan bilgileri kontrol edip onaylamanız gerekmektedir.
+                </div>
+            </div>
+
+            <div class="form-container">
+                <!-- Section 1: Belge Yükleme -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span class="section-number">1</span>
+                        Belge Yükleme (OCR)
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Belge Türü</label>
+                            <select class="form-select" id="belgeTuru">
+                                <option value="">Seçiniz...</option>
+                                <option value="fatura">Fatura</option>
+                                <option value="tevkifatli">Tevkifatlı Fatura</option>
+                                <option value="fis">Yazar Kasa / Perakende Satış Fişi</option>
+                                <option value="yurtdisi">Yurtdışı Faturası</option>
+                                <option value="dekont">Dekont / Harç / Makbuz</option>
+                                <option value="su">Su Faturası</option>
+                                <option value="gider_pusulasi">Gider Pusulası</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Masraf Tipi</label>
+                            <select class="form-select" id="masrafTipi">
+                                <option value="">Seçiniz...</option>
+                                <option value="normal">Normal Masraf</option>
+                                <option value="seyahat">Seyahat Masrafı</option>
+                                <option value="kredi_karti">Kredi Kartı Masrafı</option>
+                                <option value="kiralama">Kiralama Faturası</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Belge Görseli Preview -->
+                    <div class="document-preview-card" id="documentPreviewCard">
+                        <h3 class="preview-title">🖼️ Belge Görseli (OCR ile Okundu)</h3>
+                        <div class="document-preview-container">
+                            <!-- Simüle edilmiş fiş görseli -->
+                            <div class="receipt-simple" id="receiptSimple">
+                                <div class="receipt-simple-header">
+                                    <strong class="receipt-simple-company">KARADENIZ SOFRASI</strong>
+                                    <span class="receipt-simple-sub">Restoran & Lokanta</span>
+                                </div>
+                                <div class="receipt-simple-divider"></div>
+                                <div class="receipt-simple-info">
+                                    VKN: 1234567890<br>
+                                    Tarih: 09.12.2024 13:45<br>
+                                    Fiş No: YKF-2024-847521
+                                </div>
+                                <div class="receipt-simple-divider"></div>
+                                <div class="receipt-simple-items">
+                                    <div class="receipt-simple-item">
+                                        <span>2x Karışık Izgara</span>
+                                        <span>₺380.00</span>
+                                    </div>
+                                    <div class="receipt-simple-item">
+                                        <span>2x Pilav</span>
+                                        <span>₺60.00</span>
+                                    </div>
+                                    <div class="receipt-simple-item">
+                                        <span>2x İçecek</span>
+                                        <span>₺50.00</span>
+                                    </div>
+                                    <div class="receipt-simple-item">
+                                        <span>1x Künefe</span>
+                                        <span>₺95.00</span>
+                                    </div>
+                                </div>
+                                <div class="receipt-simple-totals">
+                                    <div class="receipt-simple-item">
+                                        <span>KDV (%10)</span>
+                                        <span>₺53.18</span>
+                                    </div>
+                                    <div class="receipt-simple-item total">
+                                        <strong>TOPLAM</strong>
+                                        <strong>₺585.00</strong>
+                                    </div>
+                                </div>
+                                <div class="receipt-simple-footer">
+                                    * TEŞEKKÜRLER *<br>
+                                    Bu belge mali değer taşır
+                                </div>
+                            </div>
+
+                            <div class="ocr-confidence-badge">
+                                <span>🤖 OCR Güven Skoru:</span>
+                                <span class="confidence-tag" id="ocrConfidenceTag">%94 Başarılı</span>
+                            </div>
+                        </div>
+
+                        <div class="document-actions">
+                            <button class="btn-action-secondary" onclick="retakePhoto()">
+                                🔄 Farklı Belge Yükle
+                            </button>
+                            <button class="btn-action-primary" onclick="processOCR()">
+                                ✨ OCR ile Tekrar Oku
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- OCR Processing Animation -->
+                    <div class="ocr-processing" id="ocrProcessing" style="display: none;">
+                        <div class="processing-animation">
+                            <div class="scan-line"></div>
+                            <div class="processing-icon">🔍</div>
+                        </div>
+                        <div class="processing-text">Belge Okunuyor...</div>
+                        <div class="processing-steps">
+                            <div class="step-item" id="step1">
+                                <span class="step-dot"></span>
+                                <span>Görüntü analiz ediliyor...</span>
+                            </div>
+                            <div class="step-item" id="step2">
+                                <span class="step-dot"></span>
+                                <span>Metin tanınıyor...</span>
+                            </div>
+                            <div class="step-item" id="step3">
+                                <span class="step-dot"></span>
+                                <span>Veriler çıkarılıyor...</span>
+                            </div>
+                            <div class="step-item" id="step4">
+                                <span class="step-dot"></span>
+                                <span>Form dolduruluyor...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OCR Success Result -->
+                    <div class="ocr-success" id="ocrSuccess" style="display: none;">
+                        <div class="success-header">
+                            <div class="success-icon">✅</div>
+                            <div class="success-text">
+                                <h3>OCR Başarılı!</h3>
+                                <p>Belge bilgileri otomatik olarak dolduruldu</p>
+                            </div>
+                            <div class="confidence-score">
+                                <div class="score-circle">
+                                    <span class="score-value">94%</span>
+                                </div>
+                                <span class="score-label">Doğruluk</span>
+                            </div>
+                        </div>
+                        <div class="ocr-extracted-preview">
+                            <div class="extracted-item">
+                                <span class="extracted-label">Firma:</span>
+                                <span class="extracted-value">KARADENIZ SOFRASI</span>
+                            </div>
+                            <div class="extracted-item">
+                                <span class="extracted-label">Tarih:</span>
+                                <span class="extracted-value">09.12.2024</span>
+                            </div>
+                            <div class="extracted-item">
+                                <span class="extracted-label">Tutar:</span>
+                                <span class="extracted-value highlight">₺585.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Area (Yeni Belge Yükleme) -->
+                    <div class="file-upload-area collapsed" id="uploadArea">
+                        <input type="file" id="fileInput" accept="image/*,.pdf" multiple>
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">Farklı Bir Belge Yükle</div>
+                        <div class="upload-hint">veya tıklayarak dosya seçin (JPG, PNG, PDF - Max 10MB)</div>
+                    </div>
+
+                    <!-- Uploaded Files List -->
+                    <div class="uploaded-files" id="uploadedFiles"></div>
+                </div>
+
+                <!-- Section 2: Belge Bilgileri -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span class="section-number">2</span>
+                        Belge Bilgileri
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Belge/Fatura No</label>
+                            <input type="text" class="form-input" id="belgeNo" placeholder="Otomatik okunacak">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Belge Tarihi</label>
+                            <input type="date" class="form-input" id="belgeTarihi">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Firma/Tedarikçi Adı</label>
+                            <input type="text" class="form-input" id="firmaAdi" placeholder="Otomatik okunacak">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vergi Kimlik No</label>
+                            <input type="text" class="form-input" id="vergiNo" placeholder="Otomatik okunacak">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label">Cari Durumu</label>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <span class="status-badge status-approved" id="cariDurum">Cari Mevcut</span>
+                                <span style="font-size: 13px; color: var(--text-secondary);">SAP Cari Kodu: 320.01.001</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Tutar Bilgileri -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span class="section-number">3</span>
+                        Tutar Bilgileri
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Brüt Tutar (TL)</label>
+                            <input type="number" class="form-input" id="brutTutar" step="0.01" placeholder="0.00" oninput="updateAmountSummary()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">KDV Oranı (%)</label>
+                            <select class="form-select" id="kdvOrani" onchange="updateAmountSummary()">
+                                <option value="0">%0</option>
+                                <option value="1">%1</option>
+                                <option value="10">%10</option>
+                                <option value="20" selected>%20</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">KDV Tutarı (TL)</label>
+                            <input type="number" class="form-input" id="kdvTutari" step="0.01" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">KDV Hariç Tutar (TL)</label>
+                            <input type="number" class="form-input" id="netTutar" step="0.01" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <!-- Tevkifat Alanları (Tevkifatlı Fatura için) -->
+                    <div id="tevkifatAlanlari" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label required">Tevkifat Oranı</label>
+                                <select class="form-select" id="tevkifatOrani" onchange="updateTevkifat()">
+                                    <option value="0">Tevkifat Yok</option>
+                                    <option value="2/10">2/10 - Yapım İşleri</option>
+                                    <option value="4/10">4/10 - Temizlik Hizmetleri</option>
+                                    <option value="5/10">5/10 - Makine Bakım</option>
+                                    <option value="7/10">7/10 - Etüt, Plan Proje</option>
+                                    <option value="9/10">9/10 - Yapı Denetim</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tevkifat Tutarı (TL)</label>
+                                <input type="number" class="form-input" id="tevkifatTutari" step="0.01" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <span class="alert-icon">ℹ️</span>
+                            <span>Tevkifatlı faturalarda KDV'nin bir kısmı satıcı tarafından beyan edilir.</span>
+                        </div>
+                    </div>
+
+                    <!-- Taşıt Gideri Ayrımı (%70 Gider / %30 KKEG) -->
+                    <div id="tasitGideriAlanlari" style="display: none;">
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <div>
+                                <strong>Taşıt Gideri Ayrımı:</strong> Bu masraf taşıt gideri olarak işaretlendi.<br>
+                                <small>Tutar otomatik olarak %70 Gider ve %30 KKEG olarak ayrılacaktır.</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Gider Kısmı (%70)</label>
+                                <input type="number" class="form-input" id="giderKismi" step="0.01" readonly style="background: #E8F5E9;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">KKEG Kısmı (%30)</label>
+                                <input type="number" class="form-input" id="kkegKismi" step="0.01" readonly style="background: #FFF3E0;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yurtdışı Masraf Alanları (gizli) -->
+                    <div id="yurtdisiAlanlari" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Döviz Tutarı</label>
+                                <input type="number" class="form-input" id="yurtdisiTutar" step="0.01" oninput="convertCurrency()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Para Birimi</label>
+                                <select class="form-select" id="paraBirimi">
+                                    <option value="USD">USD - Amerikan Doları</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - İngiliz Sterlini</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Kur Oranı</label>
+                                <input type="number" class="form-input" id="kurOrani" step="0.0001" oninput="convertCurrency()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TL Karşılığı</label>
+                                <input type="number" class="form-input" id="tlKarsiligi" readonly style="background: #f5f5f5;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Amount Summary -->
+                    <div class="amount-summary">
+                        <div class="amount-row">
+                            <span>Brüt Tutar:</span>
+                            <span id="summaryBrut">0.00 TL</span>
+                        </div>
+                        <div class="amount-row">
+                            <span>KDV Tutarı:</span>
+                            <span id="summaryKdv">0.00 TL</span>
+                        </div>
+                        <div class="amount-row">
+                            <span>KDV Hariç Tutar:</span>
+                            <span id="summaryNet">0.00 TL</span>
+                        </div>
+                        <div class="amount-row total">
+                            <span>Toplam Masraf:</span>
+                            <span id="summaryTotal">0.00 TL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Masraf Detayları -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span class="section-number">4</span>
+                        Masraf Detayları
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Masraf Merkezi</label>
+                            <input type="text" class="form-input" id="masrafMerkezi" value="50G1022 - Dijital Ürünler" readonly style="background: #f5f5f5;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Masraf Türü / Hesap Kodu</label>
+                            <select class="form-select" id="hesapKodu">
+                                <option value="">Seçiniz...</option>
+                                <optgroup label="Genel Yönetim Giderleri - Merkez (770)">
+                                    <option value="770.01">770.01 - Yemek Giderleri</option>
+                                    <option value="770.02">770.02 - Ulaşım Giderleri</option>
+                                    <option value="770.03">770.03 - Konaklama Giderleri</option>
+                                    <option value="770.04">770.04 - Ofis Malzemesi</option>
+                                    <option value="770.05">770.05 - Temsil Ağırlama</option>
+                                    <option value="770.06">770.06 - Haberleşme Giderleri</option>
+                                    <option value="770.07">770.07 - Taşıt Giderleri</option>
+                                </optgroup>
+                                <optgroup label="Pazarlama Satış Dağıtım - Mağazalar (760)">
+                                    <option value="760.01">760.01 - Mağaza Giderleri</option>
+                                    <option value="760.02">760.02 - Tanıtım Giderleri</option>
+                                    <option value="760.03">760.03 - Satış Promosyon</option>
+                                </optgroup>
+                                <optgroup label="Ar-Ge / Tasarım Merkezi (750)">
+                                    <option value="750.01">750.01 - Proje Giderleri</option>
+                                    <option value="750.02">750.02 - Araştırma Giderleri</option>
+                                    <option value="750.03">750.03 - Test ve Geliştirme</option>
+                                </optgroup>
+                                <optgroup label="Teknoloji Teknik Destek (740)">
+                                    <option value="740.01">740.01 - Yazılım Giderleri</option>
+                                    <option value="740.02">740.02 - Donanım Bakım</option>
+                                    <option value="740.03">740.03 - IT Destek Hizmetleri</option>
+                                </optgroup>
+                                <optgroup label="Fabrika Giderleri (730)">
+                                    <option value="730.01">730.01 - Üretim Giderleri</option>
+                                    <option value="730.02">730.02 - Hammadde Giderleri</option>
+                                    <option value="730.03">730.03 - Bakım Onarım</option>
+                                </optgroup>
+                                <optgroup label="Şirketlerarası Yansıtmalar (198)">
+                                    <option value="198.01">198.01 - FLO Mağazacılık Yansıtma</option>
+                                    <option value="198.02">198.02 - FLO Teknoloji Yansıtma</option>
+                                    <option value="198.03">198.03 - Turuncu Yansıtma</option>
+                                </optgroup>
+                                <optgroup label="Kiralama Giderleri (632)">
+                                    <option value="632.04.01">632.04.01 - Mağaza Asgari Kira</option>
+                                    <option value="632.04.02">632.04.02 - Ortak Yönetim Gideri</option>
+                                    <option value="632.04.03">632.04.03 - Ciro Kira Gideri</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Proje Kodu (Opsiyonel)</label>
+                            <select class="form-select" id="projeKodu">
+                                <option value="">Proje seçiniz (opsiyonel)...</option>
+                                <option value="PRJ001">PRJ001 - E-Ticaret Yenileme</option>
+                                <option value="PRJ002">PRJ002 - Mobil Uygulama v2</option>
+                                <option value="PRJ003">PRJ003 - CRM Entegrasyonu</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Şirket</label>
+                            <select class="form-select" id="sirket">
+                                <option value="flo_magazacilik">FLO Mağazacılık</option>
+                                <option value="turuncu">Turuncu Ayakkabı</option>
+                                <option value="flo_teknoloji">FLO Teknoloji</option>
+                                <option value="flo_ic_dis">FLO İç Dış Ticaret</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label class="form-label required">Masraf Açıklaması</label>
+                            <textarea class="form-textarea" id="aciklama" placeholder="Masrafın ne için yapıldığını detaylı açıklayınız..." required></textarea>
+                            <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">
+                                * Bu açıklama hesap eşleştirmesinde kullanılacaktır. Lütfen detaylı yazınız.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Onay Bilgileri -->
+                <div class="form-section">
+                    <h2 class="section-title">
+                        <span class="section-number">5</span>
+                        Onay Akışı Bilgileri
+                    </h2>
+
+                    <div class="alert alert-info">
+                        <span class="alert-icon">ℹ️</span>
+                        <div>
+                            Masraf tutarınıza göre onay akışı otomatik belirlenecektir.
+                            <strong>7.500 TL</strong> altı masraflar sadece birim müdürü onayı ile tamamlanır.
+                        </div>
+                    </div>
+
+                    <!-- Approval Timeline Preview -->
+                    <div class="approval-timeline">
+                        <div class="approval-step completed">
+                            <div class="step-circle">✓</div>
+                            <div class="step-label">Talep Oluştur</div>
+                            <div class="step-person">Berat Tanrıverdi</div>
+                        </div>
+                        <div class="approval-step current">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Yönetici Onayı</div>
+                            <div class="step-person">Mehmet Yılmaz (5.Derece)</div>
+                        </div>
+                        <div class="approval-step">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Muhasebe Onayı</div>
+                            <div class="step-person">Muhasebe Havuzu</div>
+                        </div>
+                        <div class="approval-step">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">SAP Aktarım</div>
+                            <div class="step-person">Otomatik</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="saveDraft()">
+                        💾 Taslak Kaydet
+                    </button>
+                    <button type="button" class="btn-outline" onclick="window.history.back()">
+                        İptal
+                    </button>
+                    <button type="button" class="btn-primary" onclick="submitMasrafForm()">
+                        📤 Onaya Gönder
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Show/hide fields based on belge türü
+        document.getElementById('belgeTuru').addEventListener('change', function() {
+            const yurtdisiAlanlari = document.getElementById('yurtdisiAlanlari');
+            const tevkifatAlanlari = document.getElementById('tevkifatAlanlari');
+
+            // Yurtdışı alanları
+            if (this.value === 'yurtdisi') {
+                yurtdisiAlanlari.style.display = 'block';
+            } else {
+                yurtdisiAlanlari.style.display = 'none';
+            }
+
+            // Tevkifat alanları
+            if (this.value === 'tevkifatli') {
+                tevkifatAlanlari.style.display = 'block';
+            } else {
+                tevkifatAlanlari.style.display = 'none';
+                document.getElementById('tevkifatOrani').value = '0';
+                document.getElementById('tevkifatTutari').value = '';
+            }
+        });
+
+        // Show/hide Taşıt Gideri alanları based on hesap kodu
+        document.getElementById('hesapKodu').addEventListener('change', function() {
+            const tasitGideriAlanlari = document.getElementById('tasitGideriAlanlari');
+
+            if (this.value === '770.07') {
+                tasitGideriAlanlari.style.display = 'block';
+                updateTasitGideri();
+            } else {
+                tasitGideriAlanlari.style.display = 'none';
+                document.getElementById('giderKismi').value = '';
+                document.getElementById('kkegKismi').value = '';
+            }
+        });
+
+        // Tevkifat hesaplama fonksiyonu
+        function updateTevkifat() {
+            const kdvTutari = parseFloat(document.getElementById('kdvTutari').value) || 0;
+            const tevkifatOrani = document.getElementById('tevkifatOrani').value;
+
+            if (tevkifatOrani && tevkifatOrani !== '0') {
+                const [pay, payda] = tevkifatOrani.split('/').map(Number);
+                const tevkifatTutari = kdvTutari * (pay / payda);
+                document.getElementById('tevkifatTutari').value = tevkifatTutari.toFixed(2);
+            } else {
+                document.getElementById('tevkifatTutari').value = '';
+            }
+        }
+
+        // Taşıt Gideri %70/%30 ayrımı hesaplama fonksiyonu
+        function updateTasitGideri() {
+            const netTutar = parseFloat(document.getElementById('netTutar').value) || 0;
+            const hesapKodu = document.getElementById('hesapKodu').value;
+
+            if (hesapKodu === '770.07' && netTutar > 0) {
+                const giderKismi = netTutar * 0.70;
+                const kkegKismi = netTutar * 0.30;
+
+                document.getElementById('giderKismi').value = giderKismi.toFixed(2);
+                document.getElementById('kkegKismi').value = kkegKismi.toFixed(2);
+            }
+        }
+
+        // Override updateAmountSummary to also update tevkifat and tasit gideri
+        const originalUpdateAmountSummary = window.updateAmountSummary || function() {};
+        window.updateAmountSummary = function() {
+            originalUpdateAmountSummary();
+
+            // Tutar alanları güncelle
+            const brutTutar = parseFloat(document.getElementById('brutTutar').value) || 0;
+            const kdvOrani = parseFloat(document.getElementById('kdvOrani').value) || 0;
+
+            const kdvHaricTutar = brutTutar / (1 + kdvOrani / 100);
+            const kdvTutari = brutTutar - kdvHaricTutar;
+
+            document.getElementById('kdvTutari').value = kdvTutari.toFixed(2);
+            document.getElementById('netTutar').value = kdvHaricTutar.toFixed(2);
+
+            // Summary alanları güncelle
+            document.getElementById('summaryBrut').textContent = brutTutar.toFixed(2) + ' TL';
+            document.getElementById('summaryKdv').textContent = kdvTutari.toFixed(2) + ' TL';
+            document.getElementById('summaryNet').textContent = kdvHaricTutar.toFixed(2) + ' TL';
+            document.getElementById('summaryTotal').textContent = brutTutar.toFixed(2) + ' TL';
+
+            // Tevkifat güncelle
+            if (document.getElementById('belgeTuru').value === 'tevkifatli') {
+                updateTevkifat();
+            }
+
+            // Taşıt gideri güncelle
+            if (document.getElementById('hesapKodu').value === '770.07') {
+                updateTasitGideri();
+            }
+
+            // Tutar limiti kontrolü
+            checkTutarLimiti(brutTutar);
+        };
+
+        // ============================================
+        // KURAL SETLERİ - VALİDASYON FONKSİYONLARI
+        // ============================================
+
+        // Kural 1: Tutar Limiti Kontrolü (Değiştirilebilir)
+        const TUTAR_LIMITI = 50000; // TL (ayarlanabilir)
+
+        function checkTutarLimiti(tutar) {
+            const alertContainer = document.getElementById('alertContainer');
+            const existingLimitAlert = document.getElementById('limitAlert');
+
+            if (tutar > TUTAR_LIMITI) {
+                if (!existingLimitAlert) {
+                    const alert = document.createElement('div');
+                    alert.id = 'limitAlert';
+                    alert.className = 'alert alert-error';
+                    alert.innerHTML = `
+                        <span class="alert-icon">🚫</span>
+                        <div>
+                            <strong>Tutar Limiti Aşıldı!</strong><br>
+                            Masraf tutarı belirlenen limit olan <strong>${TUTAR_LIMITI.toLocaleString('tr-TR')} TL</strong>'yi aşmaktadır.
+                            Bu masraf otomatik olarak onaylanamaz.
+                        </div>
+                    `;
+                    alertContainer.appendChild(alert);
+                }
+            } else if (existingLimitAlert) {
+                existingLimitAlert.remove();
+            }
+        }
+
+        // Kural 2: Kabul Edilmeyen Gider Kalemleri (Değiştirilebilir)
+        const REDDEDILEN_GIDER_KALEMLERI = [
+            'tekel', 'alkol', 'sigara', 'tütün', 'içki', 'bira', 'şarap', 'rakı',
+            'viski', 'votka', 'kumar', 'bahis', 'casino'
+        ];
+
+        function checkYasakliGiderKalemi(aciklama) {
+            const alertContainer = document.getElementById('alertContainer');
+            const existingGiderAlert = document.getElementById('giderAlert');
+            const lowercaseAciklama = aciklama.toLowerCase();
+
+            const bulunanYasakli = REDDEDILEN_GIDER_KALEMLERI.find(kalem =>
+                lowercaseAciklama.includes(kalem)
+            );
+
+            if (bulunanYasakli) {
+                if (!existingGiderAlert) {
+                    const alert = document.createElement('div');
+                    alert.id = 'giderAlert';
+                    alert.className = 'alert alert-error';
+                    alert.innerHTML = `
+                        <span class="alert-icon">⛔</span>
+                        <div>
+                            <strong>Kabul Edilmeyen Gider Kalemi!</strong><br>
+                            Açıklamada kabul edilmeyen gider kalemi tespit edildi: <strong>"${bulunanYasakli}"</strong><br>
+                            <small>Bu tür masraflar şirket politikası gereği kabul edilmemektedir.</small>
+                        </div>
+                    `;
+                    alertContainer.appendChild(alert);
+                }
+                return false;
+            } else if (existingGiderAlert) {
+                existingGiderAlert.remove();
+            }
+            return true;
+        }
+
+        // Açıklama alanı kontrolü
+        document.getElementById('aciklama').addEventListener('input', function() {
+            checkYasakliGiderKalemi(this.value);
+        });
+
+        // Kural 3: Mükerrer Fatura Kontrolü (Simülasyon)
+        // Gerçek uygulamada API çağrısı ile kontrol edilecek
+        const GECMIS_FATURALAR = [
+            { firmaAdi: 'KARADENIZ SOFRASI', belgeNo: 'YKF-2024-847520', belgeTarihi: '2024-12-08' },
+            { firmaAdi: 'MIGROS', belgeNo: 'F-2024-001234', belgeTarihi: '2024-12-07' }
+        ];
+
+        function checkMukerrerFatura() {
+            const firmaAdi = document.getElementById('firmaAdi').value.toUpperCase();
+            const belgeNo = document.getElementById('belgeNo').value;
+            const belgeTarihi = document.getElementById('belgeTarihi').value;
+
+            const alertContainer = document.getElementById('alertContainer');
+            const existingMukerrerAlert = document.getElementById('mukerrerAlert');
+
+            const mukerrer = GECMIS_FATURALAR.find(f =>
+                f.firmaAdi.toUpperCase() === firmaAdi &&
+                f.belgeNo === belgeNo &&
+                f.belgeTarihi === belgeTarihi
+            );
+
+            if (mukerrer) {
+                if (!existingMukerrerAlert) {
+                    const alert = document.createElement('div');
+                    alert.id = 'mukerrerAlert';
+                    alert.className = 'alert alert-error';
+                    alert.innerHTML = `
+                        <span class="alert-icon">⚠️</span>
+                        <div>
+                            <strong>Mükerrer Fatura Uyarısı!</strong><br>
+                            Bu fatura daha önce sisteme girilmiş görünüyor.<br>
+                            <small>Firma: ${firmaAdi} | Belge No: ${belgeNo} | Tarih: ${belgeTarihi}</small>
+                        </div>
+                    `;
+                    alertContainer.appendChild(alert);
+                }
+                return false;
+            } else if (existingMukerrerAlert) {
+                existingMukerrerAlert.remove();
+            }
+            return true;
+        }
+
+        // Belge alanları değiştiğinde mükerrer kontrolü
+        ['firmaAdi', 'belgeNo', 'belgeTarihi'].forEach(fieldId => {
+            document.getElementById(fieldId).addEventListener('change', checkMukerrerFatura);
+        });
+
+        // Kural 4: Şirket Eşleşme Kontrolü
+        // Çalışanın bordro şirketi ile fatura şirketi uyumlu olmalı
+        const KULLANICI_BORDRO_SIRKETI = 'flo_teknoloji'; // Örnek: Login'den gelecek
+        const SIRKET_VKN_ESLESMESI = {
+            'flo_magazacilik': ['1234567890', '9876543210'],
+            'flo_teknoloji': ['1111111111', '2222222222'],
+            'turuncu': ['3333333333', '4444444444'],
+            'flo_ic_dis': ['5555555555', '6666666666']
+        };
+
+        function checkSirketEslesmesi() {
+            const secilenSirket = document.getElementById('sirket').value;
+            const alertContainer = document.getElementById('alertContainer');
+            const existingSirketAlert = document.getElementById('sirketAlert');
+
+            if (secilenSirket !== KULLANICI_BORDRO_SIRKETI) {
+                if (!existingSirketAlert) {
+                    const alert = document.createElement('div');
+                    alert.id = 'sirketAlert';
+                    alert.className = 'alert alert-warning';
+                    alert.innerHTML = `
+                        <span class="alert-icon">⚠️</span>
+                        <div>
+                            <strong>Şirket Uyumsuzluğu!</strong><br>
+                            Bordro şirketiniz ile seçilen şirket farklı.
+                            Farklı şirket adına masraf girişi için gerekçe belirtmeniz gerekmektedir.
+                        </div>
+                    `;
+                    alertContainer.appendChild(alert);
+                }
+            } else if (existingSirketAlert) {
+                existingSirketAlert.remove();
+            }
+        }
+
+        document.getElementById('sirket').addEventListener('change', checkSirketEslesmesi);
+
+        // Form submit validasyonu
+        const originalSubmitMasrafForm = window.submitMasrafForm || function() {};
+        window.submitMasrafForm = function() {
+            const brutTutar = parseFloat(document.getElementById('brutTutar').value) || 0;
+            const aciklama = document.getElementById('aciklama').value;
+            const belgeTuru = document.getElementById('belgeTuru').value;
+            const hesapKodu = document.getElementById('hesapKodu').value;
+
+            // Zorunlu alan kontrolleri
+            if (!belgeTuru) {
+                showValidationAlert('Lütfen belge türünü seçiniz.', 'error');
+                return;
+            }
+            if (!hesapKodu) {
+                showValidationAlert('Lütfen masraf türü / hesap kodunu seçiniz.', 'error');
+                return;
+            }
+            if (!aciklama.trim()) {
+                showValidationAlert('Masraf açıklaması zorunludur.', 'error');
+                return;
+            }
+            if (brutTutar <= 0) {
+                showValidationAlert('Geçerli bir tutar giriniz.', 'error');
+                return;
+            }
+
+            // Kural seti kontrolleri
+            if (brutTutar > TUTAR_LIMITI) {
+                showValidationAlert('Tutar limiti aşıldığı için bu masraf gönderilemez.', 'error');
+                return;
+            }
+
+            if (!checkYasakliGiderKalemi(aciklama)) {
+                showValidationAlert('Kabul edilmeyen gider kalemi içeren masraf gönderilemez.', 'error');
+                return;
+            }
+
+            if (!checkMukerrerFatura()) {
+                showValidationAlert('Mükerrer fatura tespit edildi. Lütfen kontrol ediniz.', 'error');
+                return;
+            }
+
+            // Tüm kontroller geçti, formu gönder
+            showAlert('success', 'Masraf talebiniz başarıyla onaya gönderildi!');
+            setTimeout(() => {
+                window.location.href = 'masraf-listesi.html';
+            }, 2000);
+        };
+
+        // Alert gösterme fonksiyonu (main.js ile uyumlu)
+        // Not: main.js'deki showAlert(type, message) fonksiyonunu kullanıyoruz
+        // Bu sayfaya özel validasyon alertleri için ayrı bir fonksiyon tanımlıyoruz
+        function showValidationAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span class="alert-icon">${type === 'error' ? '❌' : '✅'}</span>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; cursor: pointer; font-size: 18px;">×</button>
+            `;
+            alertContainer.prepend(alert);
+
+            if (type === 'success') {
+                setTimeout(() => alert.remove(), 5000);
+            }
+        }
+
+        // Yönetici görünümü kontrolü
+        function checkManagerView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isManagerRole = urlParams.get('role') === 'manager';
+
+            if (isManagerRole) {
+                document.getElementById('sidebarEmployee').style.display = 'none';
+                document.getElementById('sidebarManager').style.display = 'block';
+            }
+        }
+
+        // Sayfa yüklendiğinde yönetici kontrolü yap
+        document.addEventListener('DOMContentLoaded', checkManagerView);
+    </script>
+</body>
+</html>

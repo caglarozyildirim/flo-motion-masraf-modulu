@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masraf Taleplerim - FLOConnect</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Manager View Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .main-tab {
+            flex: 1;
+            padding: 16px 24px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .main-tab:hover {
+            background: #F8F9FA;
+        }
+        .main-tab.active {
+            background: linear-gradient(135deg, var(--primary-burgundy), var(--primary-orange));
+            color: white;
+        }
+        .main-tab .tab-count {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .main-tab.active .tab-count {
+            background: rgba(255,255,255,0.3);
+        }
+        .main-tab:not(.active) .tab-count {
+            background: #E9ECEF;
+        }
+
+        /* Employee Badge in Cards */
+        .employee-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-burgundy));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .employee-avatar-small {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Employee Filter */
+        .employee-filter {
+            display: none;
+        }
+        .employee-filter.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 Bildirimler</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar - Employee View -->
+        <aside class="sidebar" id="sidebarEmployee">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar">BT</div>
+                <div class="user-name">Berat Tanrıverdi</div>
+                <div class="user-title">Kıdemli Uzman</div>
+                <div class="user-role">Ürün Tasarım/UX Müd.</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="calisan-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html" class="nav-link">
+                        <span class="nav-icon">🧾</span>
+                        Yeni Masraf Girişi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html" class="nav-link active">
+                        <span class="nav-icon">📋</span>
+                        Masraf Taleplerim
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Sidebar - Manager View -->
+        <aside class="sidebar" id="sidebarManager" style="display: none;">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, var(--primary-burgundy), #A0516D);">MY</div>
+                <div class="user-name">Mehmet Yılmaz</div>
+                <div class="user-title">Dijital Ürünler Direktörü</div>
+                <div class="user-role" style="background: linear-gradient(135deg, var(--primary-burgundy), #A0516D); color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px;">4. Derece Onay Yetkisi</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="yonetici-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="onay-listesi.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">7</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html?view=all" class="nav-link" id="menuMasraflarim">
+                        <span class="nav-icon">📋</span>
+                        Masraflarım
+                        <span style="background: var(--primary-orange); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">5</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html?view=team" class="nav-link" id="menuEkipMasraflari">
+                        <span class="nav-icon">👥</span>
+                        Ekip Masrafları
+                        <span style="background: var(--primary-orange); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">23</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html?role=manager" class="nav-link">
+                        <span class="nav-icon">🧾</span>
+                        Masraf Girişi
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Breadcrumb - Employee -->
+            <div class="breadcrumb" id="breadcrumbEmployee">
+                <a href="calisan-anasayfa.html">Anasayfa</a>
+                <span>›</span>
+                <span>Masraf Taleplerim</span>
+            </div>
+
+            <!-- Breadcrumb - Manager -->
+            <div class="breadcrumb" id="breadcrumbManager" style="display: none;">
+                <a href="yonetici-anasayfa.html">Anasayfa</a>
+                <span>›</span>
+                <span id="breadcrumbTitle">Masraflarım</span>
+            </div>
+
+            <!-- Content Header - Employee -->
+            <div class="content-header" id="headerEmployee">
+                <h1 class="page-title">Masraf Taleplerim</h1>
+                <a href="masraf-formu.html" class="btn-primary" style="text-decoration: none;">
+                    + Yeni Masraf
+                </a>
+            </div>
+
+            <!-- Content Header - Manager -->
+            <div class="content-header" id="headerManager" style="display: none;">
+                <h1 class="page-title" id="pageTitle">Masraflarım</h1>
+                <a href="masraf-formu.html?role=manager" class="btn-primary" style="text-decoration: none;">
+                    + Yeni Masraf
+                </a>
+            </div>
+
+            <!-- Status Tabs -->
+            <div class="tabs" id="statusTabs">
+                <div class="tab active" onclick="filterByStatus('all')">Tümü (12)</div>
+                <div class="tab" onclick="filterByStatus('pending')">Beklemede (3)</div>
+                <div class="tab" onclick="filterByStatus('approved')">Onaylanan (8)</div>
+                <div class="tab" onclick="filterByStatus('rejected')">Reddedilen (0)</div>
+                <div class="tab" onclick="filterByStatus('draft')">Taslak (1)</div>
+            </div>
+
+            <!-- Status Tabs - Team View -->
+            <div class="tabs" id="statusTabsTeam" style="display: none;">
+                <div class="tab active" onclick="filterByStatus('all')">Tümü (23)</div>
+                <div class="tab" onclick="filterByStatus('pending')">Beklemede (7)</div>
+                <div class="tab" onclick="filterByStatus('approved')">Onaylanan (14)</div>
+                <div class="tab" onclick="filterByStatus('rejected')">Reddedilen (2)</div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-controls">
+                    <div class="form-group" style="min-width: 200px;">
+                        <input type="text" class="form-input" placeholder="🔍 Talep no veya açıklama ara...">
+                    </div>
+                    <div class="form-group employee-filter" id="employeeFilter">
+                        <select class="form-select" id="employeeSelect" onchange="filterByEmployee(this.value)">
+                            <option value="">Tüm Çalışanlar</option>
+                            <option value="ayse">Ayşe Kaya</option>
+                            <option value="can">Can Yılmaz</option>
+                            <option value="elif">Elif Öztürk</option>
+                            <option value="berat">Berat Tanrıverdi</option>
+                            <option value="selin">Selin Aydın</option>
+                            <option value="murat">Murat Koç</option>
+                            <option value="zeynep">Zeynep Demir</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select">
+                            <option value="">Tüm Tarihler</option>
+                            <option value="today">Bugün</option>
+                            <option value="week">Bu Hafta</option>
+                            <option value="month">Bu Ay</option>
+                            <option value="year">Bu Yıl</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select">
+                            <option value="">Tüm Masraf Türleri</option>
+                            <option value="fatura">Fatura</option>
+                            <option value="fis">Fiş</option>
+                            <option value="yurtdisi">Yurtdışı</option>
+                        </select>
+                    </div>
+                    <button class="btn-outline" style="padding: 10px 20px; display: flex; align-items: center; gap: 8px;">
+                        📊 Excel'e Aktar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Request Cards - My Expenses -->
+            <div class="card-grid" id="myExpensesGrid">
+                <!-- Card 1 - Onay Bekliyor -->
+                <div class="request-card" data-status="pending">
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0048</h3>
+                            <p>10 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺1,250.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Müşteri toplantısı yemek masrafı</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Onay Aşaması:</span>
+                            <span class="detail-value">Yönetici Onayı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0048">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Card 2 - Muhasebe Onayında -->
+                <div class="request-card" data-status="pending">
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0047</h3>
+                            <p>9 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-waiting">Muhasebe Onayında</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fiş</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺350.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Taksi - Havalimanı transferi</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Onay Aşaması:</span>
+                            <span class="detail-value">Muhasebe Kontrolü</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0047">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Card 3 - Onaylandı -->
+                <div class="request-card" data-status="approved">
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0046</h3>
+                            <p>8 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺2,800.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Ofis malzemesi alımı</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SAP Durum:</span>
+                            <span class="detail-value" style="color: var(--success-dark);">Aktarıldı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0046">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Card 4 - Onaylandı -->
+                <div class="request-card" data-status="approved">
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0045</h3>
+                            <p>5 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fiş</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺180.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Yemek masrafı - Ekip toplantısı</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">SAP Durum:</span>
+                            <span class="detail-value" style="color: var(--success-dark);">Aktarıldı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0045">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Card 5 - Taslak -->
+                <div class="request-card" data-status="draft">
+                    <div class="card-header">
+                        <div class="card-avatar">📝</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0049</h3>
+                            <p>10 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-draft">Taslak</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺4,500.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Eğitim materyalleri</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-approve" onclick="window.location.href='masraf-formu.html?edit=0049'">Düzenle</button>
+                        <button class="btn btn-reject">Sil</button>
+                    </div>
+                </div>
+
+                <!-- Card 6 - Onay Bekliyor -->
+                <div class="request-card" data-status="pending">
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0044</h3>
+                            <p>4 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Yurtdışı Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">$250.00 (₺8,750.00)</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Yurtdışı konferans kayıt ücreti</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Onay Aşaması:</span>
+                            <span class="detail-value">Direktör Onayı (4.Derece)</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0044">Detayları Görüntüle →</a>
+                </div>
+            </div>
+
+            <!-- Request Cards - Team Expenses (Manager View) -->
+            <div class="card-grid" id="teamExpensesGrid" style="display: none;">
+                <!-- Team Card 1 - Ayşe Kaya -->
+                <div class="request-card" data-status="pending" data-employee="ayse">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">AK</span>
+                        Ayşe Kaya
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0048</h3>
+                            <p>10 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺1,250.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Müşteri toplantısı yemek masrafı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0048&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 2 - Can Yılmaz -->
+                <div class="request-card" data-status="pending" data-employee="can">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">CY</span>
+                        Can Yılmaz
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0047</h3>
+                            <p>9 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fiş</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺350.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Taksi - Havalimanı transferi</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0047&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 3 - Elif Öztürk -->
+                <div class="request-card" data-status="approved" data-employee="elif">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">EÖ</span>
+                        Elif Öztürk
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0046</h3>
+                            <p>8 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺2,800.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Ofis malzemesi alımı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0046&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 4 - Berat Tanrıverdi -->
+                <div class="request-card" data-status="pending" data-employee="berat">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">BT</span>
+                        Berat Tanrıverdi
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0044</h3>
+                            <p>4 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Yurtdışı Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">$250.00 (₺8,750.00)</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Yurtdışı konferans kayıt ücreti</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0044&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 5 - Selin Aydın -->
+                <div class="request-card" data-status="approved" data-employee="selin">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">SA</span>
+                        Selin Aydın
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0043</h3>
+                            <p>3 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺4,200.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Müşteri ziyareti konaklama</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0043&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 6 - Murat Koç -->
+                <div class="request-card" data-status="pending" data-employee="murat">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">MK</span>
+                        Murat Koç
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0042</h3>
+                            <p>2 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-pending">Onay Bekliyor</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value" style="color: var(--warning-red);">₺12,500.00 ⚠️</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Eğitim programı katılım ücreti</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0042&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 7 - Zeynep Demir -->
+                <div class="request-card" data-status="approved" data-employee="zeynep">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">ZD</span>
+                        Zeynep Demir
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0041</h3>
+                            <p>1 Aralık 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fiş</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺150.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Yemek masrafı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0041&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 8 - Ayşe Kaya - Approved -->
+                <div class="request-card" data-status="approved" data-employee="ayse">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">AK</span>
+                        Ayşe Kaya
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0040</h3>
+                            <p>28 Kasım 2024</p>
+                        </div>
+                        <span class="status-badge status-approved">Onaylandı</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺980.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Proje sunumu yemek masrafı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0040&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 9 - Can Yılmaz - Rejected -->
+                <div class="request-card" data-status="rejected" data-employee="can">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">CY</span>
+                        Can Yılmaz
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0039</h3>
+                            <p>25 Kasım 2024</p>
+                        </div>
+                        <span class="status-badge status-rejected">Reddedildi</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fiş</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺450.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Eksik belge - Yemek masrafı</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0039&role=manager">Detayları Görüntüle →</a>
+                </div>
+
+                <!-- Team Card 10 - Murat Koç - Rejected -->
+                <div class="request-card" data-status="rejected" data-employee="murat">
+                    <div class="employee-badge">
+                        <span class="employee-avatar-small">MK</span>
+                        Murat Koç
+                    </div>
+                    <div class="card-header">
+                        <div class="card-avatar">🧾</div>
+                        <div class="card-user-info">
+                            <h3>MSR-2024-0038</h3>
+                            <p>22 Kasım 2024</p>
+                        </div>
+                        <span class="status-badge status-rejected">Reddedildi</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Belge Türü:</span>
+                            <span class="detail-value">Fatura</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tutar:</span>
+                            <span class="detail-value">₺3,200.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Açıklama:</span>
+                            <span class="detail-value">Limit aşımı - Konaklama</span>
+                        </div>
+                    </div>
+                    <a class="card-link" href="masraf-detay.html?id=0038&role=manager">Detayları Görüntüle →</a>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn">‹</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">›</button>
+            </div>
+
+            <!-- Summary Stats - My Expenses -->
+            <div id="myExpensesSummary" style="margin-top: 40px; background: white; border-radius: 12px; padding: 24px;">
+                <h3 style="font-size: 16px; margin-bottom: 20px;">Bu Ay Özet</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-orange);">12</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Toplam Talep</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--success-dark);">₺18,330</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Onaylanan Tutar</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: #856404;">₺10,350</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Bekleyen Tutar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Stats - Team Expenses -->
+            <div id="teamExpensesSummary" style="display: none; margin-top: 40px; background: white; border-radius: 12px; padding: 24px;">
+                <h3 style="font-size: 16px; margin-bottom: 20px;">Ekip Masrafları - Bu Ay Özet</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--primary-orange);">23</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Toplam Talep</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--warning-red);">7</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Onay Bekleyen</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--success-dark);">₺45,250</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Onaylanan Tutar</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+                        <div style="font-size: 24px; font-weight: 700; color: #856404;">₺22,850</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Bekleyen Tutar</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Check view mode and apply correct UI
+        function checkManagerView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewMode = urlParams.get('view'); // 'all' = Masraflarım, 'team' = Ekip Masrafları
+
+            // Yönetici görünümü kontrolü (view=all veya view=team)
+            if (viewMode === 'all' || viewMode === 'team') {
+                // Show manager sidebar
+                document.getElementById('sidebarEmployee').style.display = 'none';
+                document.getElementById('sidebarManager').style.display = 'block';
+                document.getElementById('breadcrumbEmployee').style.display = 'none';
+                document.getElementById('breadcrumbManager').style.display = 'flex';
+                document.getElementById('headerEmployee').style.display = 'none';
+                document.getElementById('headerManager').style.display = 'flex';
+
+                // Aktif menü öğesini işaretle
+                if (viewMode === 'all') {
+                    // Masraflarım görünümü
+                    document.getElementById('menuMasraflarim').classList.add('active');
+                    document.getElementById('menuEkipMasraflari').classList.remove('active');
+                    document.getElementById('myExpensesGrid').style.display = 'grid';
+                    document.getElementById('teamExpensesGrid').style.display = 'none';
+                    document.getElementById('statusTabs').style.display = 'flex';
+                    document.getElementById('statusTabsTeam').style.display = 'none';
+                    document.getElementById('myExpensesSummary').style.display = 'block';
+                    document.getElementById('teamExpensesSummary').style.display = 'none';
+                    document.getElementById('employeeFilter').classList.remove('visible');
+                    document.getElementById('pageTitle').textContent = 'Masraflarım';
+                    document.getElementById('breadcrumbTitle').textContent = 'Masraflarım';
+                    document.title = 'Masraflarım - FLOConnect';
+                } else if (viewMode === 'team') {
+                    // Ekip Masrafları görünümü
+                    document.getElementById('menuMasraflarim').classList.remove('active');
+                    document.getElementById('menuEkipMasraflari').classList.add('active');
+                    document.getElementById('myExpensesGrid').style.display = 'none';
+                    document.getElementById('teamExpensesGrid').style.display = 'grid';
+                    document.getElementById('statusTabs').style.display = 'none';
+                    document.getElementById('statusTabsTeam').style.display = 'flex';
+                    document.getElementById('myExpensesSummary').style.display = 'none';
+                    document.getElementById('teamExpensesSummary').style.display = 'block';
+                    document.getElementById('employeeFilter').classList.add('visible');
+                    document.getElementById('pageTitle').textContent = 'Ekip Masrafları';
+                    document.getElementById('breadcrumbTitle').textContent = 'Ekip Masrafları';
+                    document.title = 'Ekip Masrafları - FLOConnect';
+                }
+            }
+        }
+
+        // Current filter states
+        let currentStatusFilter = 'all';
+        let currentEmployeeFilter = '';
+
+        // Filter by status
+        function filterByStatus(status) {
+            currentStatusFilter = status;
+
+            // Update active tab
+            const tabs = document.querySelectorAll('.tabs:not([style*="display: none"]) .tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Apply filters
+            applyFilters();
+        }
+
+        // Filter by employee
+        function filterByEmployee(employee) {
+            currentEmployeeFilter = employee;
+            applyFilters();
+        }
+
+        // Apply all active filters
+        function applyFilters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewMode = urlParams.get('view');
+
+            // Determine which grid to filter
+            const gridId = viewMode === 'team' ? 'teamExpensesGrid' : 'myExpensesGrid';
+            const cards = document.querySelectorAll('#' + gridId + ' .request-card');
+
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardStatus = card.dataset.status || '';
+                const cardEmployee = card.dataset.employee || '';
+
+                // Check status filter
+                let statusMatch = currentStatusFilter === 'all' || cardStatus === currentStatusFilter;
+
+                // Check employee filter (only for team view)
+                let employeeMatch = currentEmployeeFilter === '' || cardEmployee === currentEmployeeFilter;
+
+                // Show/hide card
+                if (statusMatch && employeeMatch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show "no results" message if no cards visible
+            showNoResultsMessage(gridId, visibleCount === 0);
+        }
+
+        // Show/hide "no results" message
+        function showNoResultsMessage(gridId, show) {
+            const grid = document.getElementById(gridId);
+            let noResultsDiv = grid.querySelector('.no-results-message');
+
+            if (show) {
+                if (!noResultsDiv) {
+                    noResultsDiv = document.createElement('div');
+                    noResultsDiv.className = 'no-results-message';
+                    noResultsDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: white; border-radius: 12px; color: var(--text-secondary);';
+                    noResultsDiv.innerHTML = '<div style="font-size: 48px; margin-bottom: 16px;">📭</div><p style="font-size: 16px;">Seçilen filtrelere uygun masraf bulunamadı.</p>';
+                    grid.appendChild(noResultsDiv);
+                }
+                noResultsDiv.style.display = 'block';
+            } else if (noResultsDiv) {
+                noResultsDiv.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', checkManagerView);
+    </script>
+</body>
+</html>

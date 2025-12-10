@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlar - Muhasebe Paneli</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .muhasebe-header {
+            background: linear-gradient(90deg, #107C41 0%, #1DB954 100%);
+        }
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .report-card:hover {
+            border-color: #107C41;
+            box-shadow: 0 4px 12px rgba(16, 124, 65, 0.15);
+            transform: translateY(-2px);
+        }
+        .report-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+        .report-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .report-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .chart-placeholder {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .btn-export {
+            background: #107C41;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-export:hover {
+            background: #0D5F31;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header muhasebe-header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span> <span style="font-size: 14px; opacity: 0.8;">Muhasebe</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 12 Onay Bekliyor</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #107C41, #1DB954);">FA</div>
+                <div class="user-name">Fatma Aktaş</div>
+                <div class="user-title">Muhasebe Uzmanı</div>
+                <div class="user-role">Muhasebe Departmanı</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="muhasebe-panel.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Panel
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onay-bekleyenler.html" class="nav-link">
+                        <span class="nav-icon">⏳</span>
+                        Onay Bekleyenler
+                        <span style="background: var(--warning-red); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: auto;">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-onaylananlar.html" class="nav-link">
+                        <span class="nav-icon">✅</span>
+                        Onaylananlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-sap-aktarim.html" class="nav-link">
+                        <span class="nav-icon">📤</span>
+                        SAP Aktarım (EBA2SAP)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-raporlar.html" class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        Raporlar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="muhasebe-hesap-eslestirme.html" class="nav-link">
+                        <span class="nav-icon">⚙️</span>
+                        Hesap Eşleştirme
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="muhasebe-panel.html">Panel</a>
+                <span>›</span>
+                <span>Raporlar</span>
+            </div>
+
+            <h1 class="page-title">Masraf Raporları</h1>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; align-items: center;">
+                <select class="form-select" id="periodSelect">
+                    <option value="day">Günlük</option>
+                    <option value="week">Haftalık</option>
+                    <option value="month" selected>Aylık</option>
+                    <option value="year">Yıllık</option>
+                </select>
+                <select class="form-select" id="monthSelect">
+                    <option value="12" selected>Aralık 2024</option>
+                    <option value="11">Kasım 2024</option>
+                    <option value="10">Ekim 2024</option>
+                    <option value="09">Eylül 2024</option>
+                </select>
+                <select class="form-select" id="companySelect">
+                    <option value="">Tüm Şirketler</option>
+                    <option value="flo">FLO Mağazacılık</option>
+                    <option value="turuncu">Turuncu</option>
+                    <option value="teknoloji">FLO Teknoloji</option>
+                </select>
+                <button class="btn-export" onclick="exportReport()">
+                    📥 Excel'e Aktar
+                </button>
+            </div>
+
+            <!-- Summary Stats -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid #107C41;">
+                    <div style="font-size: 32px; font-weight: 700; color: #107C41;">₺156,420</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Toplam Masraf</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--primary-orange);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--primary-orange);">245</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Toplam İşlem</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--success-dark);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--success-dark);">92%</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Onay Oranı</div>
+                </div>
+                <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid var(--primary-burgundy);">
+                    <div style="font-size: 32px; font-weight: 700; color: var(--primary-burgundy);">₺638</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">Ortalama Masraf</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div style="background: white; border-radius: 12px; padding: 24px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px;">📈 Aylık Masraf Trendi</h3>
+                    <div class="chart-placeholder">
+                        <div style="font-size: 48px; margin-bottom: 12px;">📊</div>
+                        <p>Grafik görselleştirme burada yer alacak</p>
+                        <p style="font-size: 12px; margin-top: 8px;">Chart.js veya benzeri kütüphane ile</p>
+                    </div>
+                </div>
+                <div style="background: white; border-radius: 12px; padding: 24px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px;">🥧 Kategorilere Göre Dağılım</h3>
+                    <div class="chart-placeholder">
+                        <div style="font-size: 48px; margin-bottom: 12px;">🥧</div>
+                        <p>Pasta grafik burada yer alacak</p>
+                        <p style="font-size: 12px; margin-top: 8px;">Masraf kategorileri dağılımı</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Types -->
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Hazır Raporlar</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="report-card" onclick="generateReport('daily')">
+                    <div class="report-icon">📅</div>
+                    <div class="report-title">Günlük Masraf Raporu</div>
+                    <div class="report-desc">Günlük işlemlerin detaylı listesi, tutar ve onay durumları</div>
+                </div>
+                <div class="report-card" onclick="generateReport('monthly')">
+                    <div class="report-icon">📆</div>
+                    <div class="report-title">Aylık Özet Rapor</div>
+                    <div class="report-desc">Aylık toplam masraflar, kategoriler ve şirket bazlı dağılım</div>
+                </div>
+                <div class="report-card" onclick="generateReport('department')">
+                    <div class="report-icon">🏢</div>
+                    <div class="report-title">Departman Bazlı Rapor</div>
+                    <div class="report-desc">Departmanlara göre masraf analizi ve karşılaştırma</div>
+                </div>
+                <div class="report-card" onclick="generateReport('category')">
+                    <div class="report-icon">📁</div>
+                    <div class="report-title">Kategori Bazlı Rapor</div>
+                    <div class="report-desc">Masraf kategorilerine göre detaylı analiz</div>
+                </div>
+                <div class="report-card" onclick="generateReport('employee')">
+                    <div class="report-icon">👤</div>
+                    <div class="report-title">Çalışan Bazlı Rapor</div>
+                    <div class="report-desc">Çalışan bazında masraf özeti ve trend analizi</div>
+                </div>
+                <div class="report-card" onclick="generateReport('sap')">
+                    <div class="report-icon">📤</div>
+                    <div class="report-title">SAP Aktarım Raporu</div>
+                    <div class="report-desc">SAP'ye aktarılan masrafların detaylı listesi</div>
+                </div>
+            </div>
+
+            <!-- Top Categories Table -->
+            <div style="background: white; border-radius: 12px; padding: 24px;">
+                <h3 style="font-size: 16px; margin-bottom: 20px;">En Yüksek Masraf Kategorileri</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Kategori</th>
+                            <th>Hesap Kodu</th>
+                            <th>İşlem Sayısı</th>
+                            <th>Toplam Tutar</th>
+                            <th>Oran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Yemek Giderleri</strong></td>
+                            <td>770.01</td>
+                            <td>89</td>
+                            <td><strong>₺42,350.00</strong></td>
+                            <td>27%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ulaşım Giderleri</strong></td>
+                            <td>770.02</td>
+                            <td>65</td>
+                            <td><strong>₺35,200.00</strong></td>
+                            <td>23%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ofis Malzemesi</strong></td>
+                            <td>770.04</td>
+                            <td>42</td>
+                            <td><strong>₺28,900.00</strong></td>
+                            <td>18%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Eğitim ve Konferans</strong></td>
+                            <td>770.05</td>
+                            <td>18</td>
+                            <td><strong>₺25,600.00</strong></td>
+                            <td>16%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Yazılım ve Lisans</strong></td>
+                            <td>770.06</td>
+                            <td>12</td>
+                            <td><strong>₺24,370.00</strong></td>
+                            <td>16%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        function exportReport() {
+            showAlert('success', 'Rapor Excel dosyası olarak indiriliyor...');
+        }
+
+        function generateReport(type) {
+            const reportNames = {
+                'daily': 'Günlük Masraf Raporu',
+                'monthly': 'Aylık Özet Rapor',
+                'department': 'Departman Bazlı Rapor',
+                'category': 'Kategori Bazlı Rapor',
+                'employee': 'Çalışan Bazlı Rapor',
+                'sap': 'SAP Aktarım Raporu'
+            };
+            showAlert('info', `${reportNames[type]} hazırlanıyor...`);
+        }
+    </script>
+</body>
+</html>

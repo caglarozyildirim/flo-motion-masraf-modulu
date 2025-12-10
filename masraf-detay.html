@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masraf Detayı - FLOConnect</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .detail-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .detail-header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .detail-title-section h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .detail-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .meta-item {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .meta-item strong {
+            color: var(--text-primary);
+        }
+        .detail-amount {
+            text-align: right;
+        }
+        .detail-amount .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+        .detail-amount .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .detail-card h3 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: var(--primary-orange);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .info-value {
+            font-weight: 500;
+            font-size: 14px;
+            text-align: right;
+        }
+        .document-preview {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .document-image {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .ocr-confidence {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .confidence-badge {
+            background: var(--success-green);
+            color: var(--success-dark);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .timeline-section {
+            grid-column: 1 / -1;
+        }
+        .approval-history {
+            margin-top: 16px;
+        }
+        .history-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .history-icon.created {
+            background: #E3F2FD;
+        }
+        .history-icon.approved {
+            background: var(--success-green);
+        }
+        .history-icon.pending {
+            background: var(--status-pending);
+        }
+        .history-icon.rejected {
+            background: var(--reject-red);
+        }
+        .history-content {
+            flex: 1;
+        }
+        .history-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .history-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .history-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-header {
+                flex-direction: column;
+            }
+            .detail-amount {
+                text-align: left;
+            }
+        }
+
+        /* Yönetici Onay Butonları */
+        .manager-action-buttons {
+            margin-top: 24px;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid var(--primary-orange);
+        }
+        .btn-approve {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        .btn-reject {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Modal Stilleri */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <div class="logo">FLO<span style="font-weight: 300;">Connect</span></div>
+        <div class="header-actions">
+            <button class="notification-btn">🔔 Bildirimler</button>
+        </div>
+    </header>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sidebar-close" onclick="closeMobileMenu()">✕</button>
+            <div class="user-profile">
+                <div class="user-avatar">BT</div>
+                <div class="user-name">Berat Tanrıverdi</div>
+                <div class="user-title">Kıdemli Uzman</div>
+                <div class="user-role">Ürün Tasarım/UX Müd.</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="calisan-anasayfa.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Anasayfa
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-formu.html" class="nav-link">
+                        <span class="nav-icon">🧾</span>
+                        Yeni Masraf Girişi
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="masraf-listesi.html" class="nav-link active">
+                        <span class="nav-icon">📋</span>
+                        Masraf Taleplerim
+                    </a>
+                </li>
+            </ul>
+
+            <button class="logout-btn" onclick="window.location.href='index.html'">
+                🚪 Çıkış Yap
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="calisan-anasayfa.html">Anasayfa</a>
+                <span>›</span>
+                <a href="masraf-listesi.html">Masraf Taleplerim</a>
+                <span>›</span>
+                <span id="breadcrumbId">MSR-2024-0047</span>
+            </div>
+
+            <div class="detail-container">
+                <!-- Header Section -->
+                <div class="detail-header">
+                    <div class="detail-title-section">
+                        <h1 id="detailTitle">MSR-2024-0047</h1>
+                        <span class="status-badge status-waiting" id="detailStatus">Muhasebe Onayında</span>
+                        <div class="detail-meta">
+                            <span class="meta-item">📅 Oluşturma: <strong id="detailDate">9 Aralık 2024</strong></span>
+                            <span class="meta-item">🧾 Belge: <strong id="detailBelgeTuru">Perakende Satış Fişi</strong></span>
+                            <span class="meta-item">🏢 Şirket: <strong>FLO Mağazacılık</strong></span>
+                        </div>
+                    </div>
+                    <div class="detail-amount">
+                        <div class="label">Toplam Tutar</div>
+                        <div class="amount" id="detailAmount">₺350.00</div>
+                    </div>
+                </div>
+
+                <!-- Detail Grid -->
+                <div class="detail-grid">
+                    <!-- Belge Bilgileri -->
+                    <div class="detail-card">
+                        <h3>📄 Belge Bilgileri</h3>
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Belge No</span>
+                                <span class="info-value" id="infoBelgeNo">YKF-2024-458712</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Belge Tarihi</span>
+                                <span class="info-value" id="infoBelgeTarihi">09.12.2024</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Firma/İşletme</span>
+                                <span class="info-value" id="infoFirma">UBER TURKEY TEKNOLOJİ A.Ş.</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Vergi No</span>
+                                <span class="info-value" id="infoVergiNo">9876543210</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Cari Kodu</span>
+                                <span class="info-value" style="color: var(--success-dark);">320.01.458</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tutar Bilgileri -->
+                    <div class="detail-card">
+                        <h3>💰 Tutar Bilgileri</h3>
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Brüt Tutar</span>
+                                <span class="info-value" id="infoBrut">₺350.00</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">KDV Oranı</span>
+                                <span class="info-value" id="infoKdvOran">%20</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">KDV Tutarı</span>
+                                <span class="info-value" id="infoKdvTutar">₺58.33</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">KDV Hariç</span>
+                                <span class="info-value" id="infoNet">₺291.67</span>
+                            </div>
+                            <div class="info-row" style="background: #FFF8E1; margin: -8px; padding: 16px; border-radius: 8px;">
+                                <span class="info-label" style="font-weight: 600;">Toplam</span>
+                                <span class="info-value" style="font-size: 18px; color: var(--primary-orange);">₺350.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Masraf Detayları -->
+                    <div class="detail-card">
+                        <h3>📋 Masraf Detayları</h3>
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">Masraf Merkezi</span>
+                                <span class="info-value">50G1022 - Dijital Ürünler</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Hesap Kodu</span>
+                                <span class="info-value" id="infoHesapKodu">770.02 - Ulaşım Giderleri</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Masraf Tipi</span>
+                                <span class="info-value">Seyahat Masrafı</span>
+                            </div>
+                            <div class="info-row" style="flex-direction: column; gap: 8px;">
+                                <span class="info-label">Açıklama</span>
+                                <span class="info-value" style="text-align: left; font-weight: 400;" id="infoAciklama">
+                                    Havalimanı - Ofis transferi. İş seyahati dönüşü taksi masrafı.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Belge Görseli -->
+                    <div class="detail-card">
+                        <h3>🖼️ Belge Görseli (OCR ile Okundu)</h3>
+                        <div class="document-preview">
+                            <!-- Simüle edilmiş fiş görseli -->
+                            <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; text-align: left; font-family: 'Courier New', monospace; font-size: 12px; max-width: 280px; margin: 0 auto;">
+                                <div style="text-align: center; margin-bottom: 12px;">
+                                    <strong style="font-size: 14px;">UBER TURKEY</strong><br>
+                                    <span style="font-size: 10px;">TEKNOLOJİ A.Ş.</span>
+                                </div>
+                                <div style="border-top: 1px dashed #999; border-bottom: 1px dashed #999; padding: 8px 0; margin: 8px 0;">
+                                    VKN: 9876543210<br>
+                                    Tarih: 09.12.2024 14:35<br>
+                                    Fiş No: YKF-2024-458712
+                                </div>
+                                <div style="margin: 12px 0;">
+                                    Yolculuk Ücreti......₺280.00<br>
+                                    Hizmet Bedeli........₺ 12.00<br>
+                                    <div style="border-top: 1px solid #999; margin-top: 8px; padding-top: 8px;">
+                                    KDV (%20)............₺ 58.33<br>
+                                    <strong>TOPLAM...............₺350.00</strong>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; font-size: 10px; margin-top: 12px;">
+                                    * TEŞEKKÜRLER *<br>
+                                    Bu belge mali değer taşır
+                                </div>
+                            </div>
+                            <div class="ocr-confidence" style="margin-top: 16px;">
+                                <span>🤖 OCR Güven Skoru:</span>
+                                <span class="confidence-badge">%96 Başarılı</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Onay Akışı Timeline -->
+                    <div class="detail-card timeline-section">
+                        <h3>📊 Onay Akışı</h3>
+
+                        <!-- Visual Timeline -->
+                        <div class="approval-timeline" style="margin-bottom: 24px;">
+                            <div class="approval-step completed">
+                                <div class="step-circle">✓</div>
+                                <div class="step-label">Talep Oluşturuldu</div>
+                                <div class="step-person">Berat Tanrıverdi</div>
+                            </div>
+                            <div class="approval-step completed">
+                                <div class="step-circle">✓</div>
+                                <div class="step-label">Yönetici Onayı</div>
+                                <div class="step-person">Mehmet Yılmaz</div>
+                            </div>
+                            <div class="approval-step current">
+                                <div class="step-circle">⏳</div>
+                                <div class="step-label">Muhasebe Onayı</div>
+                                <div class="step-person">Muhasebe Havuzu</div>
+                            </div>
+                            <div class="approval-step">
+                                <div class="step-circle">4</div>
+                                <div class="step-label">SAP Aktarım</div>
+                                <div class="step-person">Otomatik</div>
+                            </div>
+                        </div>
+
+                        <!-- History List -->
+                        <div class="approval-history">
+                            <div class="history-item">
+                                <div class="history-icon pending">⏳</div>
+                                <div class="history-content">
+                                    <div class="history-title">Muhasebe Onayı Bekleniyor</div>
+                                    <div class="history-desc">Masraf muhasebe havuzuna düştü, kontrol bekleniyor.</div>
+                                </div>
+                                <div class="history-time">
+                                    10 Ara 2024<br>09:15
+                                </div>
+                            </div>
+                            <div class="history-item">
+                                <div class="history-icon approved">✓</div>
+                                <div class="history-content">
+                                    <div class="history-title">Yönetici Onayladı</div>
+                                    <div class="history-desc">Mehmet Yılmaz (Direktör) masrafı onayladı.</div>
+                                </div>
+                                <div class="history-time">
+                                    10 Ara 2024<br>08:42
+                                </div>
+                            </div>
+                            <div class="history-item">
+                                <div class="history-icon created">📝</div>
+                                <div class="history-content">
+                                    <div class="history-title">Talep Oluşturuldu</div>
+                                    <div class="history-desc">Berat Tanrıverdi tarafından OCR ile oluşturuldu.</div>
+                                </div>
+                                <div class="history-time">
+                                    9 Ara 2024<br>15:20
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-secondary" onclick="window.history.back()">
+                        ← Geri Dön
+                    </button>
+                    <button class="btn-outline" onclick="window.print()">
+                        🖨️ Yazdır
+                    </button>
+                    <button class="btn-primary" onclick="downloadPDF()">
+                        📥 PDF İndir
+                    </button>
+                </div>
+
+                <!-- Yönetici Onay Butonları (Sadece onay bekliyor statüsünde ve yönetici görünümünde gösterilir) -->
+                <div class="manager-action-buttons" id="managerActions" style="display: none;">
+                    <div style="background: #FFF3CD; border: 1px solid #FFE69C; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                        <strong style="color: #856404;">⚠️ Yönetici Onay Paneli</strong>
+                        <p style="font-size: 13px; color: #856404; margin-top: 8px;">Bu masraf talebini inceleyip onaylayabilir veya reddedebilirsiniz.</p>
+                    </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn-approve" onclick="approveFromDetail()">
+                            ✓ Onayla
+                        </button>
+                        <button class="btn-reject" onclick="showRejectModal()">
+                            ✕ Reddet
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Red Nedeni Modal -->
+                <div class="modal-overlay" id="rejectModal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>❌ Masraf Reddi</h3>
+                            <button class="modal-close" onclick="closeRejectModal()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 16px;">Lütfen red nedenini belirtiniz:</p>
+                            <div class="form-group">
+                                <label class="form-label">Red Nedeni</label>
+                                <select class="form-select" id="rejectReason">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="belge_eksik">Belge eksik veya okunamıyor</option>
+                                    <option value="tutar_uyumsuz">Tutar uyuşmazlığı</option>
+                                    <option value="kategori_hatali">Yanlış kategori seçimi</option>
+                                    <option value="politika_disi">Şirket politikasına aykırı</option>
+                                    <option value="diger">Diğer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Açıklama (İsteğe bağlı)</label>
+                                <textarea class="form-textarea" id="rejectNote" rows="3" placeholder="Ek açıklama giriniz..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeRejectModal()">İptal</button>
+                            <button class="btn-reject" onclick="confirmReject()">Reddet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Örnek masraf verileri
+        const masrafData = {
+            '0049': {
+                id: 'MSR-2024-0049',
+                status: 'approved',
+                statusText: 'Onaylandı',
+                date: '10 Aralık 2024',
+                belgeTuru: 'Fatura',
+                belgeNo: 'FTR-2024-12542',
+                belgeTarihi: '10.12.2024',
+                firma: 'BULUT HİZMETLERİ A.Ş.',
+                vergiNo: '1122334455',
+                brutTutar: 12000.00,
+                kdvOran: 20,
+                hesapKodu: '770.06 - Yazılım ve Lisans',
+                aciklama: 'Bulut altyapı hizmetleri aylık kullanım bedeli',
+                ocrScore: 98,
+                calisan: 'Murat Yıldız',
+                unvan: 'Yazılım Uzmanı'
+            },
+            '0048': {
+                id: 'MSR-2024-0048',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '10 Aralık 2024',
+                belgeTuru: 'Fatura',
+                belgeNo: 'FTR-2024-00892',
+                belgeTarihi: '10.12.2024',
+                firma: 'KEBAPÇI MAHMUT USTA',
+                vergiNo: '1234567890',
+                brutTutar: 1250.00,
+                kdvOran: 10,
+                hesapKodu: '770.01 - Yemek Giderleri',
+                aciklama: 'Müşteri toplantısı yemek masrafı. 5 kişilik iş yemeği.',
+                ocrScore: 94,
+                calisan: 'Ayşe Kaya',
+                unvan: 'Kıdemli Uzman'
+            },
+            '0047': {
+                id: 'MSR-2024-0047',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '9 Aralık 2024',
+                belgeTuru: 'Fiş',
+                belgeNo: 'BTX-2024-99123',
+                belgeTarihi: '09.12.2024',
+                firma: 'BITAKSI ULAŞIM TEKNOLOJİ A.Ş.',
+                vergiNo: '9876543210',
+                brutTutar: 350.00,
+                kdvOran: 20,
+                hesapKodu: '770.02 - Ulaşım Giderleri',
+                aciklama: 'İş seyahati - Taksi masrafı',
+                ocrScore: 97,
+                calisan: 'Can Yılmaz',
+                unvan: 'Uzman'
+            },
+            '0046': {
+                id: 'MSR-2024-0046',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '8 Aralık 2024',
+                belgeTuru: 'Fatura',
+                belgeNo: 'FTR-2024-45123',
+                belgeTarihi: '08.12.2024',
+                firma: 'KIRTASIYE MARKET A.Ş.',
+                vergiNo: '5678901234',
+                brutTutar: 2800.00,
+                kdvOran: 20,
+                hesapKodu: '770.04 - Ofis Malzemesi',
+                aciklama: 'Ofis malzemesi alımı',
+                ocrScore: 98,
+                calisan: 'Elif Öztürk',
+                unvan: 'Kıdemli Uzman'
+            },
+            '0044': {
+                id: 'MSR-2024-0044',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '4 Aralık 2024',
+                belgeTuru: 'Yurtdışı Fatura',
+                belgeNo: 'INV-2024-78456',
+                belgeTarihi: '04.12.2024',
+                firma: 'AWS EMEA SARL',
+                vergiNo: 'LU26888617',
+                brutTutar: 8750.00,
+                kdvOran: 0,
+                hesapKodu: '770.05 - Eğitim ve Konferans',
+                aciklama: 'Yurtdışı konferans kayıt ücreti',
+                ocrScore: 92,
+                calisan: 'Berat Tanrıverdi',
+                unvan: 'Kıdemli Uzman',
+                limitUstu: true
+            },
+            '0043': {
+                id: 'MSR-2024-0043',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '3 Aralık 2024',
+                belgeTuru: 'Fatura',
+                belgeNo: 'FTR-2024-55789',
+                belgeTarihi: '03.12.2024',
+                firma: 'MICROSOFT YAZILIM TİC. A.Ş.',
+                vergiNo: '1234509876',
+                brutTutar: 4200.00,
+                kdvOran: 20,
+                hesapKodu: '770.06 - Yazılım ve Lisans',
+                aciklama: 'Yazılım lisans yenileme',
+                ocrScore: 99,
+                calisan: 'Selin Aydın',
+                unvan: 'Uzman'
+            },
+            '0042': {
+                id: 'MSR-2024-0042',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '2 Aralık 2024',
+                belgeTuru: 'Fatura',
+                belgeNo: 'FTR-2024-88234',
+                belgeTarihi: '02.12.2024',
+                firma: 'TEKNOLOJİ PAZARI A.Ş.',
+                vergiNo: '9876012345',
+                brutTutar: 12500.00,
+                kdvOran: 20,
+                hesapKodu: '770.08 - Ekipman Alımı',
+                aciklama: 'Ekipman alımı - Sunucu donanımı',
+                ocrScore: 96,
+                calisan: 'Murat Koç',
+                unvan: 'Müdür',
+                limitUstu: true
+            },
+            '0041': {
+                id: 'MSR-2024-0041',
+                status: 'pending',
+                statusText: 'Onay Bekliyor',
+                date: '1 Aralık 2024',
+                belgeTuru: 'Fiş',
+                belgeNo: 'YKF-2024-33256',
+                belgeTarihi: '01.12.2024',
+                firma: 'YURTIÇI KARGO',
+                vergiNo: '3456789012',
+                brutTutar: 150.00,
+                kdvOran: 20,
+                hesapKodu: '770.03 - Kargo ve Posta',
+                aciklama: 'Kargo gönderim masrafı',
+                ocrScore: 94,
+                calisan: 'Zeynep Demir',
+                unvan: 'Uzman'
+            },
+            '0045': {
+                id: 'MSR-2024-0045',
+                status: 'approved',
+                statusText: 'Onaylandı',
+                date: '5 Aralık 2024',
+                belgeTuru: 'Fiş',
+                belgeNo: 'YKF-2024-33256',
+                belgeTarihi: '05.12.2024',
+                firma: 'STARBUCKS COFFEE',
+                vergiNo: '3456789012',
+                brutTutar: 180.00,
+                kdvOran: 10,
+                hesapKodu: '770.01 - Yemek Giderleri',
+                aciklama: 'Ekip toplantısı kahve masrafı.',
+                ocrScore: 92,
+                calisan: 'Berat Tanrıverdi',
+                unvan: 'Kıdemli Uzman'
+            }
+        };
+
+        // URL'den ID al ve sayfayı doldur
+        function loadMasrafDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id') || '0047';
+            const data = masrafData[id];
+
+            if (!data) {
+                alert('Masraf bulunamadı!');
+                window.location.href = 'masraf-listesi.html';
+                return;
+            }
+
+            // Sayfayı doldur
+            document.getElementById('breadcrumbId').textContent = data.id;
+            document.getElementById('detailTitle').textContent = data.id;
+            document.getElementById('detailDate').textContent = data.date;
+            document.getElementById('detailBelgeTuru').textContent = data.belgeTuru;
+
+            const statusBadge = document.getElementById('detailStatus');
+            statusBadge.textContent = data.statusText;
+            statusBadge.className = 'status-badge status-' + data.status;
+
+            const kdvTutar = data.brutTutar * data.kdvOran / 100;
+            const netTutar = data.brutTutar - kdvTutar;
+
+            document.getElementById('detailAmount').textContent = '₺' + data.brutTutar.toFixed(2);
+            document.getElementById('infoBelgeNo').textContent = data.belgeNo;
+            document.getElementById('infoBelgeTarihi').textContent = data.belgeTarihi;
+            document.getElementById('infoFirma').textContent = data.firma;
+            document.getElementById('infoVergiNo').textContent = data.vergiNo;
+            document.getElementById('infoBrut').textContent = '₺' + data.brutTutar.toFixed(2);
+            document.getElementById('infoKdvOran').textContent = '%' + data.kdvOran;
+            document.getElementById('infoKdvTutar').textContent = '₺' + kdvTutar.toFixed(2);
+            document.getElementById('infoNet').textContent = '₺' + netTutar.toFixed(2);
+            document.getElementById('infoHesapKodu').textContent = data.hesapKodu;
+            document.getElementById('infoAciklama').textContent = data.aciklama;
+        }
+
+        function downloadPDF() {
+            alert('PDF indirme özelliği aktif edilecek.');
+        }
+
+        // Yönetici görünümü kontrolü ve onay butonlarını göster
+        function checkManagerView() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id') || '0047';
+            const data = masrafData[id];
+            const referrer = document.referrer;
+
+            // Yönetici görünümü kontrolü:
+            // 1. URL'de role=manager parametresi varsa
+            // 2. VEYA onay-listesi.html sayfasından geliyorsa
+            // 3. VE masraf statüsü "pending" (Onay Bekliyor) ise
+            const isManagerRole = urlParams.get('role') === 'manager' || referrer.includes('onay-listesi.html');
+            const isPending = data && data.status === 'pending';
+
+            if (isManagerRole && isPending) {
+                document.getElementById('managerActions').style.display = 'block';
+            }
+        }
+
+        // Detay sayfasından onaylama
+        let currentMasrafId = null;
+        function approveFromDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentMasrafId = urlParams.get('id');
+
+            if (confirm('Bu masraf talebini onaylamak istediğinize emin misiniz?')) {
+                // Simülasyon - gerçek uygulamada API çağrısı yapılacak
+                showAlert('success', `Masraf talebi MSR-2024-${currentMasrafId} başarıyla onaylandı!`);
+
+                // Statüyü güncelle
+                setTimeout(() => {
+                    window.location.href = 'onay-listesi.html';
+                }, 2000);
+            }
+        }
+
+        // Red modalını göster
+        function showRejectModal() {
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        // Red modalını kapat
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectNote').value = '';
+        }
+
+        // Reddi onayla
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value;
+            const note = document.getElementById('rejectNote').value;
+
+            if (!reason) {
+                alert('Lütfen red nedenini seçiniz.');
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            currentMasrafId = urlParams.get('id');
+
+            // Simülasyon - gerçek uygulamada API çağrısı yapılacak
+            closeRejectModal();
+            showAlert('error', `Masraf talebi MSR-2024-${currentMasrafId} reddedildi.`);
+
+            setTimeout(() => {
+                window.location.href = 'onay-listesi.html';
+            }, 2000);
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMasrafDetail();
+            checkManagerView();
+        });
+    </script>
+</body>
+</html>
