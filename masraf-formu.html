@@ -622,21 +622,112 @@
         // OCR OTOMATİK DOLDURMA SİSTEMİ
         // ============================================
 
-        // Simüle edilmiş OCR verisi (gerçek uygulamada API'den gelecek)
-        const ocrData = {
-            belgeTuru: 'fis',           // Yazar Kasa / Perakende Satış Fişi
-            masrafTipi: 'normal',        // Normal Masraf
-            firmaAdi: 'KARADENIZ SOFRASI',
-            vergiNo: '1234567890',
-            belgeNo: 'YKF-2024-847521',
-            belgeTarihi: '2024-12-09',
-            brutTutar: 585.00,
-            kdvOrani: 10,
-            kdvTutari: 53.18,
-            netTutar: 531.82,
-            masrafTuru: '770.01',        // Yemek Giderleri (restoran fişi olduğu için)
-            ocrGuvenSkoru: 94
-        };
+        // Farklı belge türleri için örnek OCR verileri
+        const sampleOCRDatasets = [
+            {
+                belgeTuru: 'fis',
+                masrafTipi: 'normal',
+                firmaAdi: 'KARADENIZ SOFRASI',
+                vergiNo: '1234567890',
+                belgeNo: 'YKF-2024-847521',
+                belgeTarihi: '2024-12-09',
+                brutTutar: 585.00,
+                kdvOrani: 10,
+                kdvTutari: 53.18,
+                netTutar: 531.82,
+                masrafTuru: '770.01',
+                ocrGuvenSkoru: 94,
+                receiptItems: [
+                    { name: '2x Karışık Izgara', price: '₺380.00' },
+                    { name: '2x Pilav', price: '₺60.00' },
+                    { name: '2x İçecek', price: '₺50.00' },
+                    { name: '1x Künefe', price: '₺95.00' }
+                ]
+            },
+            {
+                belgeTuru: 'fatura',
+                masrafTipi: 'normal',
+                firmaAdi: 'MIGROS TİCARET A.Ş.',
+                vergiNo: '9876543210',
+                belgeNo: 'FTR-2024-158742',
+                belgeTarihi: '2024-12-10',
+                brutTutar: 1250.00,
+                kdvOrani: 20,
+                kdvTutari: 208.33,
+                netTutar: 1041.67,
+                masrafTuru: '770.04',
+                ocrGuvenSkoru: 97,
+                receiptItems: [
+                    { name: 'Ofis Kırtasiye Malz.', price: '₺450.00' },
+                    { name: 'Temizlik Malzemeleri', price: '₺320.00' },
+                    { name: 'Mutfak Gereçleri', price: '₺280.00' },
+                    { name: 'Su ve İçecek', price: '₺200.00' }
+                ]
+            },
+            {
+                belgeTuru: 'fis',
+                masrafTipi: 'seyahat',
+                firmaAdi: 'UBER TURKEY',
+                vergiNo: '5554443332',
+                belgeNo: 'UBR-2024-984521',
+                belgeTarihi: '2024-12-11',
+                brutTutar: 245.00,
+                kdvOrani: 10,
+                kdvTutari: 22.27,
+                netTutar: 222.73,
+                masrafTuru: '770.02',
+                ocrGuvenSkoru: 92,
+                receiptItems: [
+                    { name: 'Havalimanı Transfer', price: '₺185.00' },
+                    { name: 'Servis Bedeli', price: '₺35.00' },
+                    { name: 'Bahşiş', price: '₺25.00' }
+                ]
+            },
+            {
+                belgeTuru: 'fatura',
+                masrafTipi: 'normal',
+                firmaAdi: 'HILTON ISTANBUL',
+                vergiNo: '1112223334',
+                belgeNo: 'HTL-2024-005847',
+                belgeTarihi: '2024-12-08',
+                brutTutar: 3500.00,
+                kdvOrani: 10,
+                kdvTutari: 318.18,
+                netTutar: 3181.82,
+                masrafTuru: '770.03',
+                ocrGuvenSkoru: 98,
+                receiptItems: [
+                    { name: '2 Gece Konaklama', price: '₺3,000.00' },
+                    { name: 'Kahvaltı Dahil', price: '₺0.00' },
+                    { name: 'Otopark Ücreti', price: '₺200.00' },
+                    { name: 'Minibar', price: '₺300.00' }
+                ]
+            },
+            {
+                belgeTuru: 'fatura',
+                masrafTipi: 'normal',
+                firmaAdi: 'AMAZON WEB SERVICES',
+                vergiNo: '7778889990',
+                belgeNo: 'AWS-2024-INV-45821',
+                belgeTarihi: '2024-12-01',
+                brutTutar: 8500.00,
+                kdvOrani: 20,
+                kdvTutari: 1416.67,
+                netTutar: 7083.33,
+                masrafTuru: '740.01',
+                ocrGuvenSkoru: 99,
+                receiptItems: [
+                    { name: 'EC2 Instance', price: '₺4,500.00' },
+                    { name: 'S3 Storage', price: '₺1,200.00' },
+                    { name: 'RDS Database', price: '₺2,000.00' },
+                    { name: 'Data Transfer', price: '₺800.00' }
+                ]
+            }
+        ];
+
+        // Aktif OCR verisi (değiştirilebilir)
+        let currentOCRIndex = 0;
+        let ocrData = sampleOCRDatasets[currentOCRIndex];
 
         // OCR ile form alanlarını otomatik doldur
         function fillFormFromOCR() {
@@ -696,6 +787,171 @@
             hesapKoduGroup.appendChild(lockIndicator);
         }
 
+        // Fiş önizleme görselini güncelle
+        function updateReceiptPreview() {
+            const receiptSimple = document.getElementById('receiptSimple');
+
+            // Masraf türü adını al
+            const masrafTuruAdi = getMasrafTuruAdi(ocrData.masrafTuru);
+
+            // Fiş içeriğini güncelle
+            let itemsHtml = '';
+            ocrData.receiptItems.forEach(item => {
+                itemsHtml += `
+                    <div class="receipt-simple-item">
+                        <span>${item.name}</span>
+                        <span>${item.price}</span>
+                    </div>
+                `;
+            });
+
+            receiptSimple.innerHTML = `
+                <div class="receipt-simple-header">
+                    <strong class="receipt-simple-company">${ocrData.firmaAdi}</strong>
+                    <span class="receipt-simple-sub">${masrafTuruAdi}</span>
+                </div>
+                <div class="receipt-simple-divider"></div>
+                <div class="receipt-simple-info">
+                    VKN: ${ocrData.vergiNo}<br>
+                    Tarih: ${formatDate(ocrData.belgeTarihi)}<br>
+                    Fiş No: ${ocrData.belgeNo}
+                </div>
+                <div class="receipt-simple-divider"></div>
+                <div class="receipt-simple-items">
+                    ${itemsHtml}
+                </div>
+                <div class="receipt-simple-totals">
+                    <div class="receipt-simple-item">
+                        <span>KDV (%${ocrData.kdvOrani})</span>
+                        <span>₺${ocrData.kdvTutari.toFixed(2)}</span>
+                    </div>
+                    <div class="receipt-simple-item total">
+                        <strong>TOPLAM</strong>
+                        <strong>₺${ocrData.brutTutar.toFixed(2)}</strong>
+                    </div>
+                </div>
+                <div class="receipt-simple-footer">
+                    * TEŞEKKÜRLER *<br>
+                    Bu belge mali değer taşır
+                </div>
+            `;
+
+            // OCR başarı bölümündeki önizlemeyi de güncelle
+            const extractedPreview = document.querySelector('.ocr-extracted-preview');
+            if (extractedPreview) {
+                extractedPreview.innerHTML = `
+                    <div class="extracted-item">
+                        <span class="extracted-label">Firma:</span>
+                        <span class="extracted-value">${ocrData.firmaAdi}</span>
+                    </div>
+                    <div class="extracted-item">
+                        <span class="extracted-label">Tarih:</span>
+                        <span class="extracted-value">${formatDate(ocrData.belgeTarihi)}</span>
+                    </div>
+                    <div class="extracted-item">
+                        <span class="extracted-label">Tutar:</span>
+                        <span class="extracted-value highlight">₺${ocrData.brutTutar.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Masraf türü adını getir
+        function getMasrafTuruAdi(kod) {
+            const masrafTurleri = {
+                '770.01': 'Yemek Giderleri',
+                '770.02': 'Ulaşım Giderleri',
+                '770.03': 'Konaklama Giderleri',
+                '770.04': 'Ofis Malzemesi',
+                '770.05': 'Temsil Ağırlama',
+                '770.06': 'Haberleşme Giderleri',
+                '770.07': 'Taşıt Giderleri',
+                '740.01': 'Yazılım Giderleri',
+                '740.02': 'Donanım Bakım',
+                '740.03': 'IT Destek Hizmetleri'
+            };
+            return masrafTurleri[kod] || 'Masraf';
+        }
+
+        // Tarih formatla
+        function formatDate(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            }
+            return dateStr;
+        }
+
+        // Farklı belge yükle butonu
+        function retakePhoto() {
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.remove('collapsed');
+            uploadArea.style.display = 'block';
+
+            // File input'u tetikle
+            document.getElementById('fileInput').click();
+        }
+
+        // Dosya yükleme işleyicisi
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                // Yeni belge yüklendi - rastgele bir OCR verisi seç (demo için)
+                currentOCRIndex = (currentOCRIndex + 1) % sampleOCRDatasets.length;
+                ocrData = sampleOCRDatasets[currentOCRIndex];
+
+                // OCR işlemini başlat
+                simulateNewOCR(e.target.files[0].name);
+            }
+        });
+
+        // Yeni OCR işlemi simülasyonu
+        function simulateNewOCR(fileName) {
+            const ocrProcessing = document.getElementById('ocrProcessing');
+            const ocrSuccess = document.getElementById('ocrSuccess');
+            const documentPreviewCard = document.getElementById('documentPreviewCard');
+            const uploadArea = document.getElementById('uploadArea');
+
+            // Upload alanını gizle
+            uploadArea.style.display = 'none';
+            uploadArea.classList.add('collapsed');
+
+            // İşleniyor animasyonunu göster
+            documentPreviewCard.style.display = 'none';
+            ocrSuccess.style.display = 'none';
+            ocrProcessing.style.display = 'block';
+
+            // Step'leri sıfırla
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            steps.forEach(step => document.getElementById(step).classList.remove('active'));
+
+            let currentStep = 0;
+
+            const stepInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                    currentStep++;
+                } else {
+                    clearInterval(stepInterval);
+
+                    setTimeout(() => {
+                        ocrProcessing.style.display = 'none';
+                        ocrSuccess.style.display = 'block';
+                        documentPreviewCard.style.display = 'block';
+
+                        // Fiş önizlemesini güncelle
+                        updateReceiptPreview();
+
+                        // Form alanlarını doldur
+                        fillFormFromOCR();
+
+                        // Başarı mesajı
+                        const masrafTuruAdi = getMasrafTuruAdi(ocrData.masrafTuru);
+                        showAlert('success', `Yeni belge okundu: "${ocrData.firmaAdi}" - Masraf türü "${masrafTuruAdi}" olarak belirlendi ve kilitlendi.`);
+                    }, 500);
+                }
+            }, 400);
+        }
+
         // OCR işlemi simülasyonu (Tekrar Oku butonu için)
         function processOCR() {
             const ocrProcessing = document.getElementById('ocrProcessing');
@@ -707,8 +963,10 @@
             ocrSuccess.style.display = 'none';
             ocrProcessing.style.display = 'block';
 
-            // Adım adım işleme simülasyonu
+            // Step'leri sıfırla
             const steps = ['step1', 'step2', 'step3', 'step4'];
+            steps.forEach(step => document.getElementById(step).classList.remove('active'));
+
             let currentStep = 0;
 
             const stepInterval = setInterval(() => {
@@ -742,6 +1000,7 @@
             // Sayfa yüklendiğinde OCR verilerini otomatik doldur
             setTimeout(() => {
                 fillFormFromOCR();
+                updateReceiptPreview();
             }, 500);
         });
 
