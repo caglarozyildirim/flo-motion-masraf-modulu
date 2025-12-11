@@ -618,6 +618,133 @@
 
     <script src="js/main.js"></script>
     <script>
+        // ============================================
+        // OCR OTOMATİK DOLDURMA SİSTEMİ
+        // ============================================
+
+        // Simüle edilmiş OCR verisi (gerçek uygulamada API'den gelecek)
+        const ocrData = {
+            belgeTuru: 'fis',           // Yazar Kasa / Perakende Satış Fişi
+            masrafTipi: 'normal',        // Normal Masraf
+            firmaAdi: 'KARADENIZ SOFRASI',
+            vergiNo: '1234567890',
+            belgeNo: 'YKF-2024-847521',
+            belgeTarihi: '2024-12-09',
+            brutTutar: 585.00,
+            kdvOrani: 10,
+            kdvTutari: 53.18,
+            netTutar: 531.82,
+            masrafTuru: '770.01',        // Yemek Giderleri (restoran fişi olduğu için)
+            ocrGuvenSkoru: 94
+        };
+
+        // OCR ile form alanlarını otomatik doldur
+        function fillFormFromOCR() {
+            // 1. Belge Türü ve Masraf Tipi otomatik doldur
+            document.getElementById('belgeTuru').value = ocrData.belgeTuru;
+            document.getElementById('masrafTipi').value = ocrData.masrafTipi;
+
+            // 2. Belge Bilgileri otomatik doldur
+            document.getElementById('firmaAdi').value = ocrData.firmaAdi;
+            document.getElementById('vergiNo').value = ocrData.vergiNo;
+            document.getElementById('belgeNo').value = ocrData.belgeNo;
+            document.getElementById('belgeTarihi').value = ocrData.belgeTarihi;
+
+            // 3. Tutar Bilgileri otomatik doldur
+            document.getElementById('brutTutar').value = ocrData.brutTutar.toFixed(2);
+            document.getElementById('kdvOrani').value = ocrData.kdvOrani;
+            document.getElementById('kdvTutari').value = ocrData.kdvTutari.toFixed(2);
+            document.getElementById('netTutar').value = ocrData.netTutar.toFixed(2);
+
+            // 4. Masraf Türü / Hesap Kodu otomatik doldur ve KİLİTLE
+            const hesapKoduSelect = document.getElementById('hesapKodu');
+            hesapKoduSelect.value = ocrData.masrafTuru;
+            hesapKoduSelect.disabled = true;
+            hesapKoduSelect.style.backgroundColor = '#e8f5e9';
+            hesapKoduSelect.style.border = '2px solid #4CAF50';
+            hesapKoduSelect.style.cursor = 'not-allowed';
+
+            // Masraf türü alanına OCR kilidi bilgisi ekle
+            addOCRLockIndicator();
+
+            // Summary alanlarını güncelle
+            document.getElementById('summaryBrut').textContent = ocrData.brutTutar.toFixed(2) + ' TL';
+            document.getElementById('summaryKdv').textContent = ocrData.kdvTutari.toFixed(2) + ' TL';
+            document.getElementById('summaryNet').textContent = ocrData.netTutar.toFixed(2) + ' TL';
+            document.getElementById('summaryTotal').textContent = ocrData.brutTutar.toFixed(2) + ' TL';
+
+            // OCR güven skoru güncelle
+            document.getElementById('ocrConfidenceTag').textContent = '%' + ocrData.ocrGuvenSkoru + ' Başarılı';
+        }
+
+        // OCR kilidi göstergesi ekle
+        function addOCRLockIndicator() {
+            const hesapKoduGroup = document.getElementById('hesapKodu').closest('.form-group');
+
+            // Önceki kilit göstergesini kaldır
+            const existingLock = hesapKoduGroup.querySelector('.ocr-lock-indicator');
+            if (existingLock) existingLock.remove();
+
+            // Yeni kilit göstergesi ekle
+            const lockIndicator = document.createElement('div');
+            lockIndicator.className = 'ocr-lock-indicator';
+            lockIndicator.innerHTML = `
+                <span style="display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 12px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius: 6px; font-size: 12px; color: #2e7d32; border: 1px solid #a5d6a7;">
+                    🔒 OCR tarafından otomatik belirlendi (Değiştirilemez)
+                </span>
+            `;
+            hesapKoduGroup.appendChild(lockIndicator);
+        }
+
+        // OCR işlemi simülasyonu (Tekrar Oku butonu için)
+        function processOCR() {
+            const ocrProcessing = document.getElementById('ocrProcessing');
+            const ocrSuccess = document.getElementById('ocrSuccess');
+            const documentPreviewCard = document.getElementById('documentPreviewCard');
+
+            // İşleniyor animasyonunu göster
+            documentPreviewCard.style.display = 'none';
+            ocrSuccess.style.display = 'none';
+            ocrProcessing.style.display = 'block';
+
+            // Adım adım işleme simülasyonu
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            let currentStep = 0;
+
+            const stepInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    document.getElementById(steps[currentStep]).classList.add('active');
+                    currentStep++;
+                } else {
+                    clearInterval(stepInterval);
+
+                    // İşlem tamamlandı - formu doldur
+                    setTimeout(() => {
+                        ocrProcessing.style.display = 'none';
+                        ocrSuccess.style.display = 'block';
+                        documentPreviewCard.style.display = 'block';
+
+                        // Form alanlarını doldur
+                        fillFormFromOCR();
+
+                        // Başarı mesajı
+                        showAlert('success', 'OCR başarılı! Tüm alanlar otomatik olarak dolduruldu. Masraf türü görsele göre belirlendi ve kilitlendi.');
+                    }, 500);
+                }
+            }, 400);
+        }
+
+        // Sayfa yüklendiğinde OCR verilerini otomatik doldur
+        document.addEventListener('DOMContentLoaded', function() {
+            // Yönetici kontrolünü yap
+            checkManagerView();
+
+            // Sayfa yüklendiğinde OCR verilerini otomatik doldur
+            setTimeout(() => {
+                fillFormFromOCR();
+            }, 500);
+        });
+
         // Show/hide fields based on belge türü
         document.getElementById('belgeTuru').addEventListener('change', function() {
             const yurtdisiAlanlari = document.getElementById('yurtdisiAlanlari');
@@ -881,7 +1008,10 @@
             const brutTutar = parseFloat(document.getElementById('brutTutar').value) || 0;
             const aciklama = document.getElementById('aciklama').value;
             const belgeTuru = document.getElementById('belgeTuru').value;
-            const hesapKodu = document.getElementById('hesapKodu').value;
+
+            // Disabled select'in değerini al (OCR tarafından kilitlenmiş olabilir)
+            const hesapKoduSelect = document.getElementById('hesapKodu');
+            const hesapKodu = hesapKoduSelect.value;
 
             // Zorunlu alan kontrolleri
             if (!belgeTuru) {
@@ -954,8 +1084,6 @@
             }
         }
 
-        // Sayfa yüklendiğinde yönetici kontrolü yap
-        document.addEventListener('DOMContentLoaded', checkManagerView);
     </script>
 </body>
 </html>
