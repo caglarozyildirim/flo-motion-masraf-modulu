@@ -855,6 +855,7 @@
         let yukluBelgeler = [];
         let giderSatirlari = [];
         let satirIdSayaci = 0;
+        let belgeIdSayaci = 0;
 
         // Karma gider kalemleri için örnek veriler (Migros fişi gibi)
         const karmaGiderOrnekleri = [
@@ -1109,9 +1110,11 @@
 
         // Demo: Karma Fiş Yükle (Migros Örneği) - Sayfa başındaki test butonu için
         function demoKarmaFisYukle() {
-            // Önce mevcut satırları temizle
+            // Önce mevcut verileri temizle (demo için sıfırdan başla)
             giderSatirlari = [];
+            yukluBelgeler = [];
             satirIdSayaci = 0;
+            belgeIdSayaci = 0;
 
             // Migros karma fiş örneği (Gıda + Kırtasiye + Temizlik + karışık KDV)
             const migrosOrnek = {
@@ -1120,6 +1123,7 @@
                 vergiNo: '9876543210',
                 belgeNo: 'MIG-2024-' + Math.floor(Math.random() * 100000),
                 belgeTarihi: new Date().toISOString().split('T')[0],
+                ocrGuvenSkoru: 96,
                 satirlar: [
                     { kalem: 'Gıda', aciklama: 'Kahvaltılık Ürünler (Peynir, Zeytin, Yumurta)', hesapKodu: '770.01', netTutar: 245.00, kdvOrani: 10 },
                     { kalem: 'Gıda', aciklama: 'İçecekler (Su, Meyve Suyu)', hesapKodu: '770.01', netTutar: 85.00, kdvOrani: 10 },
@@ -1130,31 +1134,50 @@
                 ]
             };
 
-            // Belge bilgilerini doldur
+            // Yeni belge oluştur
+            belgeIdSayaci++;
+            const yeniBelge = {
+                id: belgeIdSayaci,
+                belgeTuru: migrosOrnek.belgeTuru,
+                firmaAdi: migrosOrnek.firmaAdi,
+                vergiNo: migrosOrnek.vergiNo,
+                belgeNo: migrosOrnek.belgeNo,
+                belgeTarihi: migrosOrnek.belgeTarihi,
+                ocrGuvenSkoru: migrosOrnek.ocrGuvenSkoru,
+                satirlar: []
+            };
+
+            // Belge bilgilerini forma doldur
             document.getElementById('belgeTuru').value = migrosOrnek.belgeTuru;
             document.getElementById('firmaAdi').value = migrosOrnek.firmaAdi;
             document.getElementById('vergiNo').value = migrosOrnek.vergiNo;
             document.getElementById('belgeNo').value = migrosOrnek.belgeNo;
             document.getElementById('belgeTarihi').value = migrosOrnek.belgeTarihi;
 
-            // Gider satırlarını ekle
+            // Gider satırlarını ekle (belge ile ilişkilendir)
             migrosOrnek.satirlar.forEach(satir => {
                 satirIdSayaci++;
-                giderSatirlari.push({
+                const yeniSatir = {
                     id: satirIdSayaci,
+                    belgeId: belgeIdSayaci,
                     ...satir
-                });
+                };
+                yeniBelge.satirlar.push(yeniSatir);
+                giderSatirlari.push(yeniSatir);
             });
 
-            // Tabloyu render et ve göster
+            yukluBelgeler.push(yeniBelge);
+
+            // Tabloyu ve belge listesini render et
+            renderBelgelerListesi();
             renderGiderSatirlari();
 
-            // Belgeler listesi container'ını da göster
+            // Belgeler listesi container'ını göster
             document.getElementById('belgelerListesiContainer').style.display = 'block';
-            document.getElementById('belgeSayisi').textContent = '1 Belge';
+            document.getElementById('belgeSayisi').textContent = yukluBelgeler.length + ' Belge';
 
             // Bilgi mesajı göster
-            showAlert('success', '🛒 Migros karma fişi yüklendi! 6 gider satırı: 3 Gıda (%10 KDV), 2 Temizlik/Kırtasiye (%20 KDV), 1 Mutfak (%20 KDV). Masraf harici satırları çıkarabilirsiniz.');
+            showAlert('success', '🛒 Migros karma fişi yüklendi! 6 gider satırı: 3 Gıda (%10 KDV), 3 Temizlik/Kırtasiye/Mutfak (%20 KDV). "Yeni Belge Ekle" ile daha fazla belge ekleyebilirsiniz.');
 
             // Gider satırları section'ına scroll yap
             setTimeout(() => {
@@ -1162,10 +1185,108 @@
             }, 300);
         }
 
-        // Yeni belge ekle
+        // Yeni belge ekle - Çoklu belge desteği
         function yeniBelgeEkle() {
-            // Karma fiş yükle (demo için)
-            karmaFisYukle();
+            const ornek = karmaGiderOrnekleri[karmaOrnekIndex];
+            karmaOrnekIndex = (karmaOrnekIndex + 1) % karmaGiderOrnekleri.length;
+
+            belgeIdSayaci++;
+            const yeniBelge = {
+                id: belgeIdSayaci,
+                belgeTuru: ornek.belgeTuru,
+                firmaAdi: ornek.firmaAdi,
+                vergiNo: ornek.vergiNo,
+                belgeNo: ornek.belgeNo,
+                belgeTarihi: ornek.belgeTarihi,
+                ocrGuvenSkoru: ornek.ocrGuvenSkoru || 95,
+                satirlar: []
+            };
+
+            // Bu belgeye ait satırları ekle
+            ornek.satirlar.forEach(satir => {
+                satirIdSayaci++;
+                const yeniSatir = {
+                    id: satirIdSayaci,
+                    belgeId: belgeIdSayaci,
+                    ...satir
+                };
+                yeniBelge.satirlar.push(yeniSatir);
+                giderSatirlari.push(yeniSatir);
+            });
+
+            yukluBelgeler.push(yeniBelge);
+
+            // Belge listesini ve gider satırlarını render et
+            renderBelgelerListesi();
+            renderGiderSatirlari();
+
+            // Belge sayısını güncelle
+            document.getElementById('belgeSayisi').textContent = yukluBelgeler.length + ' Belge';
+            document.getElementById('belgelerListesiContainer').style.display = 'block';
+
+            showAlert('success', `📄 ${ornek.firmaAdi} belgesi eklendi! ${ornek.satirlar.length} gider satırı. Toplam ${yukluBelgeler.length} belge.`);
+        }
+
+        // Belge listesini render et
+        function renderBelgelerListesi() {
+            const container = document.getElementById('belgelerListesi');
+            container.innerHTML = '';
+
+            yukluBelgeler.forEach(belge => {
+                const belgeToplam = belge.satirlar.reduce((acc, s) => {
+                    const kdvTutar = s.netTutar * s.kdvOrani / 100;
+                    return acc + s.netTutar + kdvTutar;
+                }, 0);
+
+                const div = document.createElement('div');
+                div.className = 'belge-karti';
+                div.style.cssText = 'background: #f8f9fa; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary-orange);';
+                div.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 14px; color: var(--text-primary);">${belge.firmaAdi}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">
+                            ${belge.belgeNo} • ${belge.satirlar.length} satır •
+                            <strong style="color: var(--primary-orange);">₺${belgeToplam.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+                            %${belge.ocrGuvenSkoru} OCR
+                        </span>
+                        <button type="button" onclick="belgeSil(${belge.id})" class="btn-icon-delete" title="Belgeyi Kaldır"
+                            style="background: #ffebee; border: none; color: var(--warning-red); cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 14px;">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Belge sil (ve ona ait satırları da sil)
+        function belgeSil(belgeId) {
+            const belge = yukluBelgeler.find(b => b.id === belgeId);
+            if (!belge) return;
+
+            if (confirm(`"${belge.firmaAdi}" belgesini ve tüm gider satırlarını silmek istediğinize emin misiniz?`)) {
+                // Belgeye ait satırları sil
+                giderSatirlari = giderSatirlari.filter(s => s.belgeId !== belgeId);
+                // Belgeyi sil
+                yukluBelgeler = yukluBelgeler.filter(b => b.id !== belgeId);
+
+                // Yeniden render et
+                renderBelgelerListesi();
+                renderGiderSatirlari();
+
+                // Belge sayısını güncelle
+                document.getElementById('belgeSayisi').textContent = yukluBelgeler.length + ' Belge';
+
+                if (yukluBelgeler.length === 0) {
+                    document.getElementById('belgelerListesiContainer').style.display = 'none';
+                }
+
+                showAlert('info', `"${belge.firmaAdi}" belgesi ve ${belge.satirlar.length} gider satırı kaldırıldı.`);
+            }
         }
 
         // ============================================
